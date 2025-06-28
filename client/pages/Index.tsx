@@ -117,7 +117,7 @@ export default function Index() {
                 className="w-full bg-gradient-to-r from-primary to-brand-purple hover:opacity-90 transform hover:scale-105 transition-all duration-200"
               >
                 <MessageCircle className="mr-2 h-5 w-5" />
-                Start Chatting
+                Talk to Stranger
               </Button>
             </Link>
             <Link to="/video-call" className="flex-1">
