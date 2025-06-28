@@ -13,6 +13,14 @@ import VideoCall from "./pages/VideoCall";
 import LiveRooms from "./pages/LiveRooms";
 import Wallet from "./pages/Wallet";
 import Profile from "./pages/Profile";
+import FAQ from "./pages/FAQ";
+import Help from "./pages/Help";
+import Contact from "./pages/Contact";
+import Community from "./pages/Community";
+import About from "./pages/About";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import Cookies from "./pages/Cookies";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
