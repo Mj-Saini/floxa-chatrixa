@@ -57,6 +57,18 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        chat: {
+          surface: "hsl(var(--chat-surface))",
+          bubble: "hsl(var(--chat-bubble))",
+          "bubble-own": "hsl(var(--chat-bubble-own))",
+          hover: "hsl(var(--chat-hover))",
+        },
+        brand: {
+          purple: "hsl(var(--brand-purple))",
+          "purple-dark": "hsl(var(--brand-purple-dark))",
+          pink: "hsl(var(--brand-pink))",
+          blue: "hsl(var(--brand-blue))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
