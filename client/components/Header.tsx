@@ -292,16 +292,6 @@ export default function Header() {
                   </Link>
                 );
               })}
-
-              <Link to="/wallet" onClick={() => setIsMobileMenuOpen(false)}>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start space-x-2"
-                >
-                  <Wallet className="h-4 w-4" />
-                  <span>Wallet (1,250 points)</span>
-                </Button>
-              </Link>
             </nav>
           </div>
         )}
