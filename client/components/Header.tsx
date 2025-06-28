@@ -90,7 +90,7 @@ export default function Header() {
               );
             })}
 
-            {/* Chat Features Dropdown */}
+            {/* Chat Rooms Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -98,14 +98,14 @@ export default function Header() {
                   size="sm"
                   className={cn(
                     "flex items-center space-x-2 px-3",
-                    chatFeatures.some(
-                      (feature) => location.pathname === feature.href,
-                    ) &&
+                    (location.pathname.includes("/live-rooms") ||
+                      location.pathname.includes("/private-rooms") ||
+                      location.pathname.includes("/group-chat")) &&
                       "bg-primary text-primary-foreground hover:bg-primary/90",
                   )}
                 >
                   <MessageCircle className="h-4 w-4" />
-                  <span>Chat</span>
+                  <span>Chat Rooms</span>
                   <svg
                     className="h-3 w-3 ml-1"
                     fill="none"
@@ -121,20 +121,85 @@ export default function Header() {
                   </svg>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-48">
-                <DropdownMenuLabel>Chat Options</DropdownMenuLabel>
+              <DropdownMenuContent align="start" className="w-80">
+                <DropdownMenuLabel>Active Rooms</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                {chatFeatures.map((feature) => {
-                  const Icon = feature.icon;
-                  return (
-                    <DropdownMenuItem key={feature.href} asChild>
-                      <Link to={feature.href} className="flex items-center">
-                        <Icon className="mr-2 h-4 w-4" />
-                        <span>{feature.label}</span>
+                <div className="max-h-48 overflow-y-auto">
+                  {activeRooms.map((room) => (
+                    <DropdownMenuItem key={room.id} asChild>
+                      <Link
+                        to="/live-rooms"
+                        className="flex items-center justify-between p-2"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <div
+                            className={`w-2 h-2 rounded-full ${room.isActive ? "bg-green-400" : "bg-gray-400"}`}
+                          />
+                          <div>
+                            <div className="font-medium text-sm">
+                              {room.name}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {room.users} users
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {room.type}
+                        </div>
                       </Link>
                     </DropdownMenuItem>
-                  );
-                })}
+                  ))}
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/live-rooms" className="flex items-center">
+                    <Users className="mr-2 h-4 w-4" />
+                    <span>Browse All Rooms</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/private-rooms" className="flex items-center">
+                    <Plus className="mr-2 h-4 w-4" />
+                    <span>Create New Room</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel>My Groups</DropdownMenuLabel>
+                <div className="max-h-32 overflow-y-auto">
+                  {myGroups.map((group) => (
+                    <DropdownMenuItem key={group.id} asChild>
+                      <Link
+                        to="/group-chat"
+                        className="flex items-center justify-between p-2"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <Users className="h-4 w-4" />
+                          <div>
+                            <div className="font-medium text-sm">
+                              {group.name}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {group.members} members
+                            </div>
+                          </div>
+                        </div>
+                        {group.unread > 0 && (
+                          <div className="bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                            {group.unread}
+                          </div>
+                        )}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/group-chat" className="flex items-center">
+                    <Plus className="mr-2 h-4 w-4" />
+                    <span>Create New Group</span>
+                  </Link>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </nav>
