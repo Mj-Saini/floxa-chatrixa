@@ -54,6 +54,7 @@ const App = () => (
             <Route path="live-rooms" element={<LiveRooms />} />
             <Route path="wallet" element={<Wallet />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="membership" element={<Membership />} />
 
             {/* Footer pages */}
             <Route path="help" element={<Help />} />
