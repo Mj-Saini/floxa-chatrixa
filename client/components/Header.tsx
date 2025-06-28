@@ -271,6 +271,37 @@ export default function Header() {
                   </Link>
                 );
               })}
+
+              {/* Chat Features Section */}
+              <div className="px-3 py-2">
+                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Chat Options
+                </div>
+              </div>
+              {chatFeatures.map((feature) => {
+                const Icon = feature.icon;
+                const isActive = location.pathname === feature.href;
+                return (
+                  <Link
+                    key={feature.href}
+                    to={feature.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Button
+                      variant={isActive ? "default" : "ghost"}
+                      className={cn(
+                        "w-full justify-start space-x-2 ml-4",
+                        isActive &&
+                          "bg-primary text-primary-foreground hover:bg-primary/90",
+                      )}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span>{feature.label}</span>
+                    </Button>
+                  </Link>
+                );
+              })}
+
               <Link to="/wallet" onClick={() => setIsMobileMenuOpen(false)}>
                 <Button
                   variant="ghost"
