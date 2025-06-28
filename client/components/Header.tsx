@@ -37,9 +37,15 @@ export default function Header() {
 
   const navItems = [
     { href: "/", label: "Home", icon: MessageCircle },
+    { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
+  ];
+
+  const chatFeatures = [
+    { href: "/stranger-chat", label: "Talk to Stranger", icon: MessageCircle },
     { href: "/video-call", label: "Video Call", icon: Users },
     { href: "/live-rooms", label: "Live Rooms", icon: Users },
-    { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
+    { href: "/private-rooms", label: "Private Rooms", icon: Users },
+    { href: "/group-chat", label: "Group Chat", icon: Users },
   ];
 
   return (
