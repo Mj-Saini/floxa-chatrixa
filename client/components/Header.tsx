@@ -22,6 +22,7 @@ import {
   Trophy,
   Plus,
   Wallet,
+  Video,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
