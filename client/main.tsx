@@ -18,6 +18,7 @@ import Chats from "./pages/Chats";
 import Groups from "./pages/Groups";
 import Calls from "./pages/Calls";
 import Status from "./pages/Status";
+import StrangerChat from "./pages/StrangerChat";
 import FAQ from "./pages/FAQ";
 import Help from "./pages/Help";
 import Contact from "./pages/Contact";
