@@ -39,6 +39,14 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<Layout />}>
             <Route index element={<Index />} />
+
+            {/* Chat Pages */}
+            <Route path="chats" element={<Chats />} />
+            <Route path="groups" element={<Groups />} />
+            <Route path="calls" element={<Calls />} />
+            <Route path="status" element={<Status />} />
+
+            {/* Other main pages */}
             <Route path="video-call" element={<VideoCall />} />
             <Route path="live-rooms" element={<LiveRooms />} />
             <Route path="wallet" element={<Wallet />} />
