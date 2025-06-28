@@ -13,14 +13,15 @@ import { Badge } from "@/components/ui/badge";
 import {
   MessageCircle,
   Bell,
-  Wallet,
   User,
   Settings,
   LogOut,
   Menu,
   X,
-  Coins,
   Users,
+  Trophy,
+  Plus,
+} from "lucide-react";
   Trophy,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -98,26 +99,14 @@ export default function Header() {
                   size="sm"
                   className={cn(
                     "flex items-center space-x-2 px-3",
-                    (location.pathname.includes("/live-rooms") ||
-                      location.pathname.includes("/private-rooms") ||
-                      location.pathname.includes("/group-chat")) &&
+                    (location.pathname.includes('/live-rooms') || location.pathname.includes('/private-rooms') || location.pathname.includes('/group-chat')) &&
                       "bg-primary text-primary-foreground hover:bg-primary/90",
                   )}
                 >
                   <MessageCircle className="h-4 w-4" />
                   <span>Chat Rooms</span>
-                  <svg
-                    className="h-3 w-3 ml-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
+                  <svg className="h-3 w-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </Button>
               </DropdownMenuTrigger>
@@ -127,26 +116,15 @@ export default function Header() {
                 <div className="max-h-48 overflow-y-auto">
                   {activeRooms.map((room) => (
                     <DropdownMenuItem key={room.id} asChild>
-                      <Link
-                        to="/live-rooms"
-                        className="flex items-center justify-between p-2"
-                      >
+                      <Link to="/live-rooms" className="flex items-center justify-between p-2">
                         <div className="flex items-center space-x-2">
-                          <div
-                            className={`w-2 h-2 rounded-full ${room.isActive ? "bg-green-400" : "bg-gray-400"}`}
-                          />
+                          <div className={`w-2 h-2 rounded-full ${room.isActive ? 'bg-green-400' : 'bg-gray-400'}`} />
                           <div>
-                            <div className="font-medium text-sm">
-                              {room.name}
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              {room.users} users
-                            </div>
+                            <div className="font-medium text-sm">{room.name}</div>
+                            <div className="text-xs text-muted-foreground">{room.users} users</div>
                           </div>
                         </div>
-                        <div className="text-xs text-muted-foreground">
-                          {room.type}
-                        </div>
+                        <div className="text-xs text-muted-foreground">{room.type}</div>
                       </Link>
                     </DropdownMenuItem>
                   ))}
@@ -169,19 +147,12 @@ export default function Header() {
                 <div className="max-h-32 overflow-y-auto">
                   {myGroups.map((group) => (
                     <DropdownMenuItem key={group.id} asChild>
-                      <Link
-                        to="/group-chat"
-                        className="flex items-center justify-between p-2"
-                      >
+                      <Link to="/group-chat" className="flex items-center justify-between p-2">
                         <div className="flex items-center space-x-2">
                           <Users className="h-4 w-4" />
                           <div>
-                            <div className="font-medium text-sm">
-                              {group.name}
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              {group.members} members
-                            </div>
+                            <div className="font-medium text-sm">{group.name}</div>
+                            <div className="text-xs text-muted-foreground">{group.members} members</div>
                           </div>
                         </div>
                         {group.unread > 0 && (
@@ -206,6 +177,7 @@ export default function Header() {
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-3">
+
             {/* Notifications */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -362,6 +334,8 @@ export default function Header() {
                   </Link>
                 );
               })}
+
+
             </nav>
           </div>
         )}
