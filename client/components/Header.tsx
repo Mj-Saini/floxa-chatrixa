@@ -332,35 +332,87 @@ export default function Header() {
                 );
               })}
 
-              {/* Chat Features Section */}
+              {/* Active Rooms Section */}
               <div className="px-3 py-2">
                 <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  Chat Options
+                  Active Rooms
                 </div>
               </div>
-              {chatFeatures.map((feature) => {
-                const Icon = feature.icon;
-                const isActive = location.pathname === feature.href;
-                return (
-                  <Link
-                    key={feature.href}
-                    to={feature.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
+              {activeRooms.slice(0, 3).map((room) => (
+                <Link
+                  key={room.id}
+                  to="/live-rooms"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start space-x-2 ml-4"
                   >
-                    <Button
-                      variant={isActive ? "default" : "ghost"}
-                      className={cn(
-                        "w-full justify-start space-x-2 ml-4",
-                        isActive &&
-                          "bg-primary text-primary-foreground hover:bg-primary/90",
-                      )}
-                    >
-                      <Icon className="h-4 w-4" />
-                      <span>{feature.label}</span>
-                    </Button>
-                  </Link>
-                );
-              })}
+                    <div
+                      className={`w-2 h-2 rounded-full ${room.isActive ? "bg-green-400" : "bg-gray-400"}`}
+                    />
+                    <span className="truncate">{room.name}</span>
+                    <span className="text-xs text-muted-foreground">
+                      ({room.users})
+                    </span>
+                  </Button>
+                </Link>
+              ))}
+
+              {/* My Groups Section */}
+              <div className="px-3 py-2 mt-2">
+                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  My Groups
+                </div>
+              </div>
+              {myGroups.slice(0, 2).map((group) => (
+                <Link
+                  key={group.id}
+                  to="/group-chat"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start space-x-2 ml-4"
+                  >
+                    <Users className="h-4 w-4" />
+                    <span className="truncate">{group.name}</span>
+                    {group.unread > 0 && (
+                      <div className="bg-primary text-primary-foreground text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                        {group.unread}
+                      </div>
+                    )}
+                  </Button>
+                </Link>
+              ))}
+
+              {/* Quick Actions */}
+              <div className="px-3 py-2 mt-2">
+                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Quick Actions
+                </div>
+              </div>
+              <Link to="/live-rooms" onClick={() => setIsMobileMenuOpen(false)}>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start space-x-2 ml-4"
+                >
+                  <Users className="h-4 w-4" />
+                  <span>Browse All Rooms</span>
+                </Button>
+              </Link>
+              <Link
+                to="/private-rooms"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start space-x-2 ml-4"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>Create New Room</span>
+                </Button>
+              </Link>
             </nav>
           </div>
         )}
