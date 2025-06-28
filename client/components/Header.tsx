@@ -84,6 +84,54 @@ export default function Header() {
                 </Link>
               );
             })}
+
+            {/* Chat Features Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "flex items-center space-x-2 px-3",
+                    chatFeatures.some(
+                      (feature) => location.pathname === feature.href,
+                    ) &&
+                      "bg-primary text-primary-foreground hover:bg-primary/90",
+                  )}
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  <span>Chat</span>
+                  <svg
+                    className="h-3 w-3 ml-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48">
+                <DropdownMenuLabel>Chat Options</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {chatFeatures.map((feature) => {
+                  const Icon = feature.icon;
+                  return (
+                    <DropdownMenuItem key={feature.href} asChild>
+                      <Link to={feature.href} className="flex items-center">
+                        <Icon className="mr-2 h-4 w-4" />
+                        <span>{feature.label}</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </nav>
 
           {/* Right Side Actions */}
