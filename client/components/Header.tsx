@@ -19,10 +19,8 @@ import {
   Menu,
   X,
   Users,
-  Trophy,
-  Plus,
-  Wallet,
   Video,
+  Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -58,141 +56,39 @@ export default function Header() {
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-1">
+          {/* Instagram-style Navigation */}
+          <nav className="hidden md:flex items-center space-x-6">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = location.pathname === item.href;
+              const isActive =
+                location.pathname === item.href ||
+                (item.href === "/" && location.pathname === "/");
               return (
                 <Link key={item.href} to={item.href}>
-                  <Button
-                    variant={isActive ? "default" : "ghost"}
-                    size="sm"
-                    className={cn(
-                      "flex items-center space-x-2 px-3",
-                      isActive &&
-                        "bg-primary text-primary-foreground hover:bg-primary/90",
+                  <div className="flex flex-col items-center space-y-1 p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                    <Icon
+                      className={cn(
+                        "h-6 w-6 transition-colors",
+                        isActive
+                          ? "text-primary"
+                          : "text-muted-foreground hover:text-foreground",
+                      )}
+                    />
+                    <span
+                      className={cn(
+                        "text-xs font-medium transition-colors",
+                        isActive ? "text-primary" : "text-muted-foreground",
+                      )}
+                    >
+                      {item.label}
+                    </span>
+                    {isActive && (
+                      <div className="w-1 h-1 bg-primary rounded-full" />
                     )}
-                  >
-                    <Icon className="h-4 w-4" />
-                    <span>{item.label}</span>
-                  </Button>
+                  </div>
                 </Link>
               );
             })}
-
-            {/* Chat Rooms Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn(
-                    "flex items-center space-x-2 px-3",
-                    (location.pathname.includes("/live-rooms") ||
-                      location.pathname.includes("/private-rooms") ||
-                      location.pathname.includes("/group-chat")) &&
-                      "bg-primary text-primary-foreground hover:bg-primary/90",
-                  )}
-                >
-                  <MessageCircle className="h-4 w-4" />
-                  <span>Chat Rooms</span>
-                  <svg
-                    className="h-3 w-3 ml-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-80">
-                <DropdownMenuLabel>Active Rooms</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <div className="max-h-48 overflow-y-auto">
-                  {activeRooms.map((room) => (
-                    <DropdownMenuItem key={room.id} asChild>
-                      <Link
-                        to="/live-rooms"
-                        className="flex items-center justify-between p-2"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <div
-                            className={`w-2 h-2 rounded-full ${room.isActive ? "bg-green-400" : "bg-gray-400"}`}
-                          />
-                          <div>
-                            <div className="font-medium text-sm">
-                              {room.name}
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              {room.users} users
-                            </div>
-                          </div>
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {room.type}
-                        </div>
-                      </Link>
-                    </DropdownMenuItem>
-                  ))}
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link to="/live-rooms" className="flex items-center">
-                    <Users className="mr-2 h-4 w-4" />
-                    <span>Browse All Rooms</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/private-rooms" className="flex items-center">
-                    <Plus className="mr-2 h-4 w-4" />
-                    <span>Create New Room</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel>My Groups</DropdownMenuLabel>
-                <div className="max-h-32 overflow-y-auto">
-                  {myGroups.map((group) => (
-                    <DropdownMenuItem key={group.id} asChild>
-                      <Link
-                        to="/group-chat"
-                        className="flex items-center justify-between p-2"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <Users className="h-4 w-4" />
-                          <div>
-                            <div className="font-medium text-sm">
-                              {group.name}
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              {group.members} members
-                            </div>
-                          </div>
-                        </div>
-                        {group.unread > 0 && (
-                          <div className="bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                            {group.unread}
-                          </div>
-                        )}
-                      </Link>
-                    </DropdownMenuItem>
-                  ))}
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link to="/group-chat" className="flex items-center">
-                    <Plus className="mr-2 h-4 w-4" />
-                    <span>Create New Group</span>
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </nav>
 
           {/* Right Side Actions */}
@@ -267,6 +163,12 @@ export default function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                  <Link to="/membership" className="flex items-center">
+                    <span className="mr-2">👑</span>
+                    <span>Upgrade to Pro</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link to="/settings" className="flex items-center">
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
@@ -299,112 +201,40 @@ export default function Header() {
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-border/50 py-4">
-            <nav className="flex flex-col space-y-2">
+            <nav className="grid grid-cols-5 gap-4">
               {navItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = location.pathname === item.href;
+                const isActive =
+                  location.pathname === item.href ||
+                  (item.href === "/" && location.pathname === "/");
                 return (
                   <Link
                     key={item.href}
                     to={item.href}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <Button
-                      variant={isActive ? "default" : "ghost"}
-                      className={cn(
-                        "w-full justify-start space-x-2",
-                        isActive &&
-                          "bg-primary text-primary-foreground hover:bg-primary/90",
+                    <div className="flex flex-col items-center space-y-1 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                      <Icon
+                        className={cn(
+                          "h-6 w-6 transition-colors",
+                          isActive ? "text-primary" : "text-muted-foreground",
+                        )}
+                      />
+                      <span
+                        className={cn(
+                          "text-xs font-medium transition-colors",
+                          isActive ? "text-primary" : "text-muted-foreground",
+                        )}
+                      >
+                        {item.label}
+                      </span>
+                      {isActive && (
+                        <div className="w-1 h-1 bg-primary rounded-full" />
                       )}
-                    >
-                      <Icon className="h-4 w-4" />
-                      <span>{item.label}</span>
-                    </Button>
+                    </div>
                   </Link>
                 );
               })}
-
-              {/* Active Rooms Section */}
-              <div className="px-3 py-2">
-                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  Active Rooms
-                </div>
-              </div>
-              {activeRooms.slice(0, 3).map((room) => (
-                <Link
-                  key={room.id}
-                  to="/live-rooms"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start space-x-2 ml-4"
-                  >
-                    <div
-                      className={`w-2 h-2 rounded-full ${room.isActive ? "bg-green-400" : "bg-gray-400"}`}
-                    />
-                    <span className="truncate">{room.name}</span>
-                    <span className="text-xs text-muted-foreground">
-                      ({room.users})
-                    </span>
-                  </Button>
-                </Link>
-              ))}
-
-              {/* My Groups Section */}
-              <div className="px-3 py-2 mt-2">
-                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  My Groups
-                </div>
-              </div>
-              {myGroups.slice(0, 2).map((group) => (
-                <Link
-                  key={group.id}
-                  to="/group-chat"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start space-x-2 ml-4"
-                  >
-                    <Users className="h-4 w-4" />
-                    <span className="truncate">{group.name}</span>
-                    {group.unread > 0 && (
-                      <div className="bg-primary text-primary-foreground text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                        {group.unread}
-                      </div>
-                    )}
-                  </Button>
-                </Link>
-              ))}
-
-              {/* Quick Actions */}
-              <div className="px-3 py-2 mt-2">
-                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  Quick Actions
-                </div>
-              </div>
-              <Link to="/live-rooms" onClick={() => setIsMobileMenuOpen(false)}>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start space-x-2 ml-4"
-                >
-                  <Users className="h-4 w-4" />
-                  <span>Browse All Rooms</span>
-                </Button>
-              </Link>
-              <Link
-                to="/private-rooms"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start space-x-2 ml-4"
-                >
-                  <Plus className="h-4 w-4" />
-                  <span>Create New Room</span>
-                </Button>
-              </Link>
             </nav>
           </div>
         )}
