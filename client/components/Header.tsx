@@ -21,6 +21,7 @@ import {
   Users,
   Trophy,
   Plus,
+  Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
