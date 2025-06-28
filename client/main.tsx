@@ -39,6 +39,17 @@ const App = () => (
             <Route path="live-rooms" element={<LiveRooms />} />
             <Route path="wallet" element={<Wallet />} />
             <Route path="profile" element={<Profile />} />
+
+            {/* Footer pages */}
+            <Route path="help" element={<Help />} />
+            <Route path="contact" element={<Contact />} />
+            <Route path="community" element={<Community />} />
+            <Route path="faq" element={<FAQ />} />
+            <Route path="privacy" element={<Privacy />} />
+            <Route path="terms" element={<Terms />} />
+            <Route path="about" element={<About />} />
+            <Route path="cookies" element={<Cookies />} />
+
             {/* Placeholder routes */}
             <Route path="stranger-chat" element={<VideoCall />} />
             <Route path="private-rooms" element={<LiveRooms />} />
@@ -46,8 +57,6 @@ const App = () => (
             <Route path="leaderboard" element={<Profile />} />
             <Route path="refer" element={<Wallet />} />
             <Route path="settings" element={<Profile />} />
-            <Route path="terms" element={<NotFound />} />
-            <Route path="privacy" element={<NotFound />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
