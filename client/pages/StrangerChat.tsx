@@ -144,8 +144,13 @@ export default function StrangerChat() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="flex flex-col h-[calc(100vh-12rem)]">
+    <div className="min-h-screen bg-background">
+      <PageHeader
+        title="Talk to Stranger"
+        subtitle="Connect with people worldwide through anonymous text chat"
+      />
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="flex flex-col h-[calc(100vh-16rem)]">
         {/* Header */}
         <Card className="bg-card/50 backdrop-blur-sm border-border/50 mb-4">
           <CardHeader className="pb-3">
