@@ -136,15 +136,6 @@ export default function Header() {
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-3">
-            {/* Wallet */}
-            <Link to="/wallet">
-              <Button variant="outline" size="sm" className="hidden sm:flex">
-                <Wallet className="h-4 w-4 mr-2" />
-                <span className="text-sm font-medium">1,250</span>
-                <Coins className="h-4 w-4 ml-1 text-yellow-500" />
-              </Button>
-            </Link>
-
             {/* Notifications */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
