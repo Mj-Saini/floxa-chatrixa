@@ -40,12 +40,17 @@ export default function Header() {
     { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
   ];
 
-  const chatFeatures = [
-    { href: "/stranger-chat", label: "Talk to Stranger", icon: MessageCircle },
-    { href: "/video-call", label: "Video Call", icon: Users },
-    { href: "/live-rooms", label: "Live Rooms", icon: Users },
-    { href: "/private-rooms", label: "Private Rooms", icon: Users },
-    { href: "/group-chat", label: "Group Chat", icon: Users },
+  const activeRooms = [
+    { id: 1, name: "General Chat", users: 245, type: "public", isActive: true },
+    { id: 2, name: "Music Lovers", users: 89, type: "public", isActive: true },
+    { id: 3, name: "Tech Talk", users: 156, type: "public", isActive: true },
+    { id: 4, name: "Study Group", users: 24, type: "private", isActive: true },
+  ];
+
+  const myGroups = [
+    { id: 1, name: "College Friends", members: 12, unread: 3 },
+    { id: 2, name: "Work Team", members: 8, unread: 0 },
+    { id: 3, name: "Gaming Squad", members: 15, unread: 7 },
   ];
 
   return (
