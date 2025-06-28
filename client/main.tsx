@@ -64,8 +64,10 @@ const App = () => (
             <Route path="about" element={<About />} />
             <Route path="cookies" element={<Cookies />} />
 
+            {/* Stranger Chat */}
+            <Route path="stranger-chat" element={<StrangerChat />} />
+
             {/* Placeholder routes */}
-            <Route path="stranger-chat" element={<VideoCall />} />
             <Route path="private-rooms" element={<LiveRooms />} />
             <Route path="group-chat" element={<LiveRooms />} />
             <Route path="leaderboard" element={<Profile />} />
