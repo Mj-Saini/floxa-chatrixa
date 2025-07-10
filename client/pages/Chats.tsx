@@ -7,6 +7,7 @@ import { Search, Filter, Archive } from "lucide-react";
 
 export default function Chats() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilter, setActiveFilter] = useState("all");
 
   const mockChats = [
     {
