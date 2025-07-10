@@ -125,6 +125,7 @@ export default function CreateGroup() {
 
   const handleCreateGroup = () => {
     const groupData = {
+      id: Date.now().toString(),
       name: groupName,
       description: groupDescription,
       members: selectedMembers,
@@ -133,7 +134,16 @@ export default function CreateGroup() {
     };
 
     console.log("Creating group:", groupData);
-    // In real app, this would call API to create group
+    // Store in localStorage temporarily to show in groups list
+    const existingGroups = JSON.parse(
+      localStorage.getItem("createdGroups") || "[]",
+    );
+    localStorage.setItem(
+      "createdGroups",
+      JSON.stringify([groupData, ...existingGroups]),
+    );
+
+    // Navigate back to groups
     navigate("/groups");
   };
 
