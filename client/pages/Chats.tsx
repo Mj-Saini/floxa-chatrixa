@@ -24,6 +24,7 @@ export default function Chats() {
       isMuted: false,
       isRead: false,
       isGroup: false,
+      isArchived: false,
     },
     {
       id: "2",
@@ -40,6 +41,7 @@ export default function Chats() {
       isRead: false,
       isGroup: true,
       lastSender: "Mike",
+      isArchived: false,
     },
     {
       id: "3",
@@ -55,6 +57,7 @@ export default function Chats() {
       isMuted: false,
       isRead: false,
       isGroup: false,
+      isArchived: false,
     },
     {
       id: "4",
@@ -71,6 +74,7 @@ export default function Chats() {
       isRead: true,
       isGroup: true,
       lastSender: "Emma",
+      isArchived: false,
     },
     {
       id: "5",
@@ -86,6 +90,7 @@ export default function Chats() {
       isMuted: false,
       isRead: true,
       isGroup: false,
+      isArchived: false,
     },
     {
       id: "6",
@@ -102,6 +107,7 @@ export default function Chats() {
       isRead: false,
       isGroup: true,
       lastSender: "Mom",
+      isArchived: false,
     },
     {
       id: "7",
@@ -117,6 +123,7 @@ export default function Chats() {
       isMuted: false,
       isRead: true,
       isGroup: false,
+      isArchived: false,
     },
     {
       id: "8",
@@ -133,6 +140,40 @@ export default function Chats() {
       isRead: false,
       isGroup: true,
       lastSender: "David",
+      isArchived: false,
+    },
+    {
+      id: "9",
+      name: "Old Project Team",
+      avatar: "",
+      lastMessage: "Great working with you all!",
+      timestamp: "2024-01-10T14:20:00Z",
+      unreadCount: 0,
+      isOnline: false,
+      messageType: "text" as const,
+      isTyping: false,
+      isPinned: false,
+      isMuted: false,
+      isRead: true,
+      isGroup: true,
+      lastSender: "Tom",
+      isArchived: true,
+    },
+    {
+      id: "10",
+      name: "Emma Wilson",
+      avatar: "",
+      lastMessage: "See you next time!",
+      timestamp: "2024-01-08T11:15:00Z",
+      unreadCount: 0,
+      isOnline: false,
+      messageType: "text" as const,
+      isTyping: false,
+      isPinned: false,
+      isMuted: false,
+      isRead: true,
+      isGroup: false,
+      isArchived: true,
     },
   ];
 
