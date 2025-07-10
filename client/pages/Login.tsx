@@ -240,6 +240,8 @@ export default function Login() {
                         id="signup-email"
                         type="email"
                         placeholder="Enter your email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         className="pl-10 bg-background/50 border-border/50 focus:border-primary"
                       />
                     </div>
@@ -253,6 +255,8 @@ export default function Login() {
                         id="signup-username"
                         type="text"
                         placeholder="Choose a username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                         className="pl-10 bg-background/50 border-border/50 focus:border-primary"
                       />
                     </div>
@@ -266,6 +270,8 @@ export default function Login() {
                         id="signup-password"
                         type={showPassword ? "text" : "password"}
                         placeholder="Create a password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         className="pl-10 pr-10 bg-background/50 border-border/50 focus:border-primary"
                       />
                       <button
@@ -290,6 +296,8 @@ export default function Login() {
                         id="confirm-password"
                         type={showConfirmPassword ? "text" : "password"}
                         placeholder="Confirm your password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
                         className="pl-10 pr-10 bg-background/50 border-border/50 focus:border-primary"
                       />
                       <button
@@ -309,6 +317,8 @@ export default function Login() {
                   </div>
 
                   <Button
+                    type="button"
+                    onClick={handleSignup}
                     className="w-full bg-primary hover:bg-primary/90"
                     size="lg"
                   >
