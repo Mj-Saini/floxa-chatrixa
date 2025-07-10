@@ -28,7 +28,7 @@ export default function Login() {
               <MessageCircle className="h-8 w-8 text-primary-foreground" />
             </div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-brand-pink bg-clip-text text-transparent">
-              ChatFlow
+              cHaTRiXa
             </h1>
           </div>
           <p className="text-muted-foreground">
