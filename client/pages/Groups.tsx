@@ -21,6 +21,13 @@ import {
 export default function Groups() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const [createdGroups, setCreatedGroups] = useState<any[]>([]);
+
+  // Load created groups from localStorage
+  useEffect(() => {
+    const groups = JSON.parse(localStorage.getItem("createdGroups") || "[]");
+    setCreatedGroups(groups);
+  }, []);
 
   const myGroups = [
     {
