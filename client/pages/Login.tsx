@@ -170,6 +170,8 @@ export default function Login() {
                   </div>
 
                   <Button
+                    type="button"
+                    onClick={handleLogin}
                     className="w-full bg-primary hover:bg-primary/90"
                     size="lg"
                   >
@@ -208,10 +210,24 @@ export default function Login() {
                   Continue with Google
                 </Button>
 
-                <Button variant="outline" className="w-full" size="lg">
-                  <User className="mr-2 h-4 w-4" />
-                  Continue as Guest
-                </Button>
+                <div className="space-y-2">
+                  <Input
+                    type="text"
+                    placeholder="Enter username for guest access"
+                    value={guestUsername}
+                    onChange={(e) => setGuestUsername(e.target.value)}
+                    className="bg-background/50 border-border/50 focus:border-primary"
+                  />
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    size="lg"
+                    onClick={handleGuestLogin}
+                  >
+                    <User className="mr-2 h-4 w-4" />
+                    Continue as Guest
+                  </Button>
+                </div>
               </TabsContent>
 
               <TabsContent value="signup" className="space-y-4">
