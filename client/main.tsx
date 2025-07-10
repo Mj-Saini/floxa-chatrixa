@@ -10,6 +10,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./components/Layout";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
+import GenderSelection from "./pages/GenderSelection";
+import ProtectedRoute from "./components/ProtectedRoute";
 import VideoCall from "./pages/VideoCall";
 import LiveRooms from "./pages/LiveRooms";
 import Wallet from "./pages/Wallet";
@@ -40,24 +42,112 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/" element={<Layout />}>
+          <Route path="/gender-selection" element={<GenderSelection />} />
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
             <Route index element={<Index />} />
 
-            {/* Chat Pages */}
-            <Route path="chats" element={<Chats />} />
-            <Route path="chat/:chatId" element={<ChatInterface />} />
-            <Route path="groups" element={<Groups />} />
-            <Route path="create-group" element={<CreateGroup />} />
-            <Route path="calls" element={<Calls />} />
-            <Route path="status" element={<Navigate to="/chats" replace />} />
+            {/* Chat Pages - Guests allowed */}
+            <Route
+              path="chats"
+              element={
+                <ProtectedRoute guestAllowed={false}>
+                  <Chats />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="chat/:chatId"
+              element={
+                <ProtectedRoute guestAllowed={false}>
+                  <ChatInterface />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="groups"
+              element={
+                <ProtectedRoute guestAllowed={false}>
+                  <Groups />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="create-group"
+              element={
+                <ProtectedRoute guestAllowed={false}>
+                  <CreateGroup />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="calls"
+              element={
+                <ProtectedRoute guestAllowed={false}>
+                  <Calls />
+                </ProtectedRoute>
+              }
+            />
 
-            {/* Other main pages */}
-            <Route path="video-call" element={<VideoCall />} />
-            <Route path="live-rooms" element={<LiveRooms />} />
-            <Route path="wallet" element={<Wallet />} />
-            <Route path="profile" element={<Profile />} />
-            <Route path="membership" element={<Membership />} />
+            {/* Guest Allowed Pages */}
+            <Route
+              path="video-call"
+              element={
+                <ProtectedRoute guestAllowed={true}>
+                  <VideoCall />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="stranger-chat"
+              element={
+                <ProtectedRoute guestAllowed={true}>
+                  <StrangerChat />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Registered Users Only */}
+            <Route
+              path="live-rooms"
+              element={
+                <ProtectedRoute guestAllowed={false}>
+                  <LiveRooms />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="wallet"
+              element={
+                <ProtectedRoute guestAllowed={false}>
+                  <Wallet />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="profile"
+              element={
+                <ProtectedRoute guestAllowed={false}>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="membership"
+              element={
+                <ProtectedRoute guestAllowed={false}>
+                  <Membership />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Footer pages */}
             <Route path="help" element={<Help />} />
@@ -68,9 +158,10 @@ const App = () => (
             <Route path="terms" element={<Terms />} />
             <Route path="about" element={<About />} />
             <Route path="cookies" element={<Cookies />} />
-
-            {/* Stranger Chat */}
-            <Route path="stranger-chat" element={<StrangerChat />} />
+            <Route
+              path="status"
+              element={<Navigate to="/home/chats" replace />}
+            />
 
             {/* Placeholder routes */}
             <Route path="private-rooms" element={<LiveRooms />} />

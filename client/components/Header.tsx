@@ -37,10 +37,10 @@ export default function Header() {
   }
 
   const navItems = [
-    { href: "/", label: "Home", icon: MessageCircle },
-    { href: "/stranger-chat", label: "Chat", icon: MessageCircle },
-    { href: "/video-call", label: "Video", icon: Video },
-    { href: "/chats", label: "Messages", icon: Users },
+    { href: "/home", label: "Home", icon: MessageCircle },
+    { href: "/home/stranger-chat", label: "Chat", icon: MessageCircle },
+    { href: "/home/video-call", label: "Video", icon: Video },
+    { href: "/home/chats", label: "Messages", icon: Users },
   ];
 
   return (
@@ -48,7 +48,7 @@ export default function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to="/home" className="flex items-center space-x-2">
             <div className="p-2 bg-primary rounded-xl">
               <MessageCircle className="h-6 w-6 text-primary-foreground" />
             </div>
