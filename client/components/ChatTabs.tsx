@@ -46,13 +46,6 @@ export default function ChatTabs({ children }: ChatTabsProps) {
       count: 0,
       href: "/calls",
     },
-    {
-      id: "status",
-      label: "Status",
-      icon: Video,
-      count: 5,
-      href: "/status",
-    },
   ];
 
   return (
