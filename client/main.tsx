@@ -47,7 +47,9 @@ const App = () => (
 
             {/* Chat Pages */}
             <Route path="chats" element={<Chats />} />
+            <Route path="chat/:chatId" element={<ChatInterface />} />
             <Route path="groups" element={<Groups />} />
+            <Route path="create-group" element={<CreateGroup />} />
             <Route path="calls" element={<Calls />} />
             <Route path="status" element={<Status />} />
 
