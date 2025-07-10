@@ -172,18 +172,12 @@ export default function Calls() {
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="p-4 space-y-3 border-b border-border/30">
-          <div className="flex space-x-3">
-            <Button className="flex-1" size="sm">
-              <Video className="h-4 w-4 mr-2" />
-              Start Video Call
-            </Button>
-            <Button variant="outline" className="flex-1" size="sm">
-              <Phone className="h-4 w-4 mr-2" />
-              Start Voice Call
-            </Button>
-          </div>
+        {/* Header */}
+        <div className="p-4 border-b border-border/30">
+          <h2 className="text-lg font-semibold">Call History</h2>
+          <p className="text-sm text-muted-foreground">
+            Your recent calls and contacts
+          </p>
         </div>
 
         {/* Calls List */}
