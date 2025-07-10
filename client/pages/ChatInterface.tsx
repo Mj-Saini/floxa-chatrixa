@@ -654,14 +654,20 @@ export default function ChatInterface() {
       </div>
 
       <input
-        ref={fileInputRef}
+        ref={cameraInputRef}
+        type="file"
+        className="hidden"
+        accept="image/*"
+        capture="environment"
+        onChange={handleCameraCapture}
+      />
+
+      <input
+        ref={galleryInputRef}
         type="file"
         className="hidden"
         accept="image/*,video/*,.pdf,.doc,.docx"
-        onChange={(e) => {
-          // Handle file upload
-          console.log("File selected:", e.target.files?.[0]);
-        }}
+        onChange={handleGallerySelect}
       />
     </div>
   );
