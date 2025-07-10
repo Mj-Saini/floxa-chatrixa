@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 
 export default function Groups() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
 
   const myGroups = [
