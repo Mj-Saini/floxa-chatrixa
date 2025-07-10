@@ -16,7 +16,16 @@ import {
   Smile,
   Paperclip,
   MoreVertical,
+  Camera,
+  Image,
+  Mic,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Message {
   id: string;
@@ -24,6 +33,14 @@ interface Message {
   sender: "me" | "stranger";
   timestamp: Date;
   type: "text" | "system";
+}
+
+interface StrangerInfo {
+  country: string;
+  gender: string;
+  isTyping: boolean;
+  name: string;
+  avatar?: string;
 }
 
 export default function StrangerChat() {
@@ -372,12 +389,165 @@ export default function StrangerChat() {
                   </div>
 
                   <div className="flex items-center space-x-2">
-                    <Button variant="ghost" size="sm">
-                      <Paperclip className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <Smile className="h-4 w-4" />
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm">
+                          <Paperclip className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start">
+                        <DropdownMenuItem>
+                          <Camera className="h-4 w-4 mr-2" />
+                          Camera
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Image className="h-4 w-4 mr-2" />
+                          Photo & Video
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Mic className="h-4 w-4 mr-2" />
+                          Audio
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm">
+                          <Smile className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="start"
+                        className="w-80 max-h-60 overflow-y-auto"
+                      >
+                        <div className="grid grid-cols-10 gap-1 p-2">
+                          {[
+                            "😀",
+                            "😃",
+                            "😄",
+                            "😁",
+                            "😆",
+                            "😅",
+                            "😂",
+                            "🤣",
+                            "😊",
+                            "😇",
+                            "🙂",
+                            "🙃",
+                            "😉",
+                            "😌",
+                            "😍",
+                            "🥰",
+                            "😘",
+                            "😗",
+                            "😙",
+                            "😚",
+                            "😋",
+                            "😛",
+                            "😝",
+                            "😜",
+                            "🤪",
+                            "🤨",
+                            "🧐",
+                            "🤓",
+                            "😎",
+                            "🤩",
+                            "🥳",
+                            "😏",
+                            "😒",
+                            "😞",
+                            "😔",
+                            "😟",
+                            "😕",
+                            "🙁",
+                            "☹️",
+                            "😣",
+                            "😖",
+                            "😫",
+                            "😩",
+                            "🥺",
+                            "😢",
+                            "😭",
+                            "😤",
+                            "😠",
+                            "😡",
+                            "🤬",
+                            "🤯",
+                            "😳",
+                            "🥵",
+                            "🥶",
+                            "😱",
+                            "😨",
+                            "😰",
+                            "😥",
+                            "😓",
+                            "🤗",
+                            "🤔",
+                            "🤭",
+                            "🤫",
+                            "🤥",
+                            "😶",
+                            "😐",
+                            "😑",
+                            "😬",
+                            "🙄",
+                            "😯",
+                            "👍",
+                            "👎",
+                            "👌",
+                            "✌️",
+                            "🤞",
+                            "🤟",
+                            "🤘",
+                            "🤙",
+                            "👈",
+                            "👉",
+                            "👆",
+                            "👇",
+                            "☝️",
+                            "✋",
+                            "🤚",
+                            "🖐",
+                            "🖖",
+                            "👋",
+                            "🤝",
+                            "👏",
+                            "❤️",
+                            "🧡",
+                            "💛",
+                            "💚",
+                            "💙",
+                            "💜",
+                            "🖤",
+                            "🤍",
+                            "🤎",
+                            "💔",
+                            "❣️",
+                            "💕",
+                            "💞",
+                            "💓",
+                            "💗",
+                            "💖",
+                            "💘",
+                            "💝",
+                            "💟",
+                            "☮️",
+                          ].map((emoji, index) => (
+                            <button
+                              key={index}
+                              type="button"
+                              onClick={() =>
+                                setNewMessage((prev) => prev + emoji)
+                              }
+                              className="text-2xl hover:bg-muted rounded p-1 transition-colors cursor-pointer"
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                     <Input
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
