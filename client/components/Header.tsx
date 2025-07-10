@@ -64,7 +64,7 @@ export default function Header() {
                 const Icon = item.icon;
                 const isActive =
                   location.pathname === item.href ||
-                  (item.href === "/" && location.pathname === "/");
+                  (item.href === "/home" && location.pathname === "/home");
                 return (
                   <Link key={item.href} to={item.href}>
                     <div className="flex flex-col items-center space-y-1 p-2 rounded-lg hover:bg-muted/50 transition-colors">
@@ -209,7 +209,7 @@ export default function Header() {
                 const Icon = item.icon;
                 const isActive =
                   location.pathname === item.href ||
-                  (item.href === "/" && location.pathname === "/");
+                  (item.href === "/home" && location.pathname === "/home");
                 return (
                   <Link
                     key={item.href}
