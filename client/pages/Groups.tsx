@@ -34,7 +34,7 @@ export default function Groups() {
       id: "1",
       name: "Tech Team",
       avatar: "",
-      lastMessage: "The new update looks great! ���",
+      lastMessage: "The new update looks great! 🚀",
       timestamp: "2024-01-15T09:45:00Z",
       unreadCount: 12,
       isOnline: false,
@@ -154,7 +154,7 @@ export default function Groups() {
   );
 
   const handleGroupClick = (groupId: string) => {
-    console.log("Open group:", groupId);
+    navigate(`/chat/${groupId}`);
   };
 
   const getRoleIcon = (role: string) => {

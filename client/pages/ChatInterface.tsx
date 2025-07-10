@@ -59,6 +59,7 @@ export default function ChatInterface() {
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);
+  const emojiPickerRef = useRef<HTMLDivElement>(null);
 
   const emojis = [
     "😀",
@@ -224,12 +225,32 @@ export default function ChatInterface() {
 
   useEffect(scrollToBottom, [messages]);
 
+  // Close emoji picker when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        emojiPickerRef.current &&
+        !emojiPickerRef.current.contains(event.target as Node)
+      ) {
+        setShowEmojiPicker(false);
+      }
+    }
+
+    if (showEmojiPicker) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showEmojiPicker]);
+
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
 
     const message: Message = {
       id: Date.now().toString(),
-      content: newMessage,
+      content: newMessage.trim(),
       sender: "me",
       timestamp: new Date(),
       type: "text",
@@ -237,6 +258,9 @@ export default function ChatInterface() {
 
     setMessages((prev) => [...prev, message]);
     setNewMessage("");
+
+    // Close emoji picker if open
+    setShowEmojiPicker(false);
 
     // Simulate other user typing and response
     setTimeout(() => setIsTyping(true), 1000);
@@ -248,6 +272,9 @@ export default function ChatInterface() {
         "Thanks for sharing!",
         "That makes sense",
         "Good to know!",
+        "👍",
+        "😊 Nice!",
+        "Tell me more about that",
       ];
       const response: Message = {
         id: (Date.now() + 1).toString(),
@@ -257,7 +284,7 @@ export default function ChatInterface() {
         type: "text",
       };
       setMessages((prev) => [...prev, response]);
-    }, 3000);
+    }, 2000);
   };
 
   const handleEditMessage = (messageId: string) => {
@@ -312,7 +339,7 @@ export default function ChatInterface() {
 
   const handleEmojiClick = (emoji: string) => {
     setNewMessage((prev) => prev + emoji);
-    // Keep emoji picker open for multiple selections
+    setShowEmojiPicker(false);
   };
 
   const handleCameraCapture = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -353,12 +380,15 @@ export default function ChatInterface() {
     if (file) {
       const audioMessage: Message = {
         id: Date.now().toString(),
-        content: `🎵 Audio shared: ${file.name}`,
+        content: `🎵 ${file.name}`,
         sender: "me",
         timestamp: new Date(),
         type: "audio",
       };
       setMessages((prev) => [...prev, audioMessage]);
+
+      // Clear the input for next selection
+      event.target.value = "";
     }
   };
 
@@ -545,7 +575,10 @@ export default function ChatInterface() {
             </Button>
 
             {showEmojiPicker && (
-              <div className="absolute bottom-12 left-0 bg-background border border-border rounded-lg p-4 shadow-lg z-50 w-80 max-h-60 overflow-y-auto">
+              <div
+                ref={emojiPickerRef}
+                className="absolute bottom-12 left-0 bg-background border border-border rounded-lg p-4 shadow-lg z-50 w-80 max-h-60 overflow-y-auto"
+              >
                 <div className="grid grid-cols-10 gap-1">
                   {emojis.map((emoji, index) => (
                     <button
@@ -569,7 +602,12 @@ export default function ChatInterface() {
           <Input
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage();
+              }
+            }}
             placeholder="Type a message..."
             className="flex-1"
           />

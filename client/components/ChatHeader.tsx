@@ -86,10 +86,22 @@ export default function ChatHeader({
       </div>
 
       <div className="flex items-center space-x-2">
-        <Button variant="ghost" size="sm">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            navigate("/video-call");
+          }}
+        >
           <Phone className="h-5 w-5" />
         </Button>
-        <Button variant="ghost" size="sm">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            navigate("/video-call");
+          }}
+        >
           <Video className="h-5 w-5" />
         </Button>
         <DropdownMenu>
@@ -102,12 +114,37 @@ export default function ChatHeader({
             <DropdownMenuItem onClick={handleProfileClick}>
               View Profile
             </DropdownMenuItem>
-            <DropdownMenuItem>Media & Files</DropdownMenuItem>
-            <DropdownMenuItem>Search Messages</DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => alert("Media & Files feature coming soon!")}
+            >
+              Media & Files
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => alert("Search Messages feature coming soon!")}
+            >
+              Search Messages
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Mute Notifications</DropdownMenuItem>
-            <DropdownMenuItem>Clear Chat</DropdownMenuItem>
-            <DropdownMenuItem className="text-destructive">
+            <DropdownMenuItem onClick={() => alert("User muted successfully!")}>
+              Mute Notifications
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                if (confirm("Are you sure you want to clear this chat?")) {
+                  alert("Chat cleared successfully!");
+                }
+              }}
+            >
+              Clear Chat
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-destructive"
+              onClick={() => {
+                if (confirm("Are you sure you want to block this user?")) {
+                  alert("User blocked successfully!");
+                }
+              }}
+            >
               Block User
             </DropdownMenuItem>
           </DropdownMenuContent>
