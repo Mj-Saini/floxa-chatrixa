@@ -11,6 +11,7 @@ import Layout from "./components/Layout";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import GenderSelection from "./pages/GenderSelection";
+import GuestSetup from "./pages/GuestSetup";
 import ProtectedRoute from "./components/ProtectedRoute";
 import VideoCall from "./pages/VideoCall";
 import LiveRooms from "./pages/LiveRooms";
@@ -45,6 +46,7 @@ const App = () => (
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/gender-selection" element={<GenderSelection />} />
+          <Route path="/guest-setup" element={<GuestSetup />} />
           <Route
             path="/home"
             element={

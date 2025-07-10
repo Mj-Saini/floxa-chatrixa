@@ -24,7 +24,12 @@ export default function ProtectedRoute({
 
   // If user is authenticated but hasn't completed onboarding
   if (isAuthenticated && !hasCompletedOnboarding) {
-    return <Navigate to="/gender-selection" replace />;
+    // Guest users go to guest setup, registered users go to gender selection
+    if (userType === "guest") {
+      return <Navigate to="/guest-setup" replace />;
+    } else {
+      return <Navigate to="/gender-selection" replace />;
+    }
   }
 
   // If route doesn't allow guests but user is a guest

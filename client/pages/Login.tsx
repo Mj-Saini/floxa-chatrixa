@@ -24,7 +24,6 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [username, setUsername] = useState("");
-  const [guestUsername, setGuestUsername] = useState("");
 
   const handleLogin = () => {
     if (!email || !password) {
@@ -37,7 +36,7 @@ export default function Login() {
     localStorage.setItem("username", email.split("@")[0]);
     localStorage.setItem("isAuthenticated", "true");
 
-    // Redirect to gender selection
+    // Redirect to gender selection for registered users
     navigate("/gender-selection");
   };
 
@@ -54,21 +53,6 @@ export default function Login() {
     // Save new user data
     localStorage.setItem("userType", "registered");
     localStorage.setItem("username", username);
-    localStorage.setItem("isAuthenticated", "true");
-
-    // Redirect to gender selection
-    navigate("/gender-selection");
-  };
-
-  const handleGuestLogin = () => {
-    if (!guestUsername.trim()) {
-      alert("Please enter a username for guest access");
-      return;
-    }
-
-    // Save guest user data
-    localStorage.setItem("userType", "guest");
-    localStorage.setItem("username", guestUsername);
     localStorage.setItem("isAuthenticated", "true");
 
     // Redirect to gender selection
@@ -210,24 +194,15 @@ export default function Login() {
                   Continue with Google
                 </Button>
 
-                <div className="space-y-2">
-                  <Input
-                    type="text"
-                    placeholder="Enter username for guest access"
-                    value={guestUsername}
-                    onChange={(e) => setGuestUsername(e.target.value)}
-                    className="bg-background/50 border-border/50 focus:border-primary"
-                  />
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    size="lg"
-                    onClick={handleGuestLogin}
-                  >
-                    <User className="mr-2 h-4 w-4" />
-                    Continue as Guest
-                  </Button>
-                </div>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  size="lg"
+                  onClick={() => navigate("/guest-setup")}
+                >
+                  <User className="mr-2 h-4 w-4" />
+                  Continue as Guest
+                </Button>
               </TabsContent>
 
               <TabsContent value="signup" className="space-y-4">
