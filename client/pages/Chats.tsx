@@ -227,21 +227,62 @@ export default function Chats() {
           {/* Quick Actions */}
           <div className="flex items-center space-x-2 mt-3">
             <Button
-              variant="ghost"
+              variant={activeFilter === "all" ? "default" : "ghost"}
               size="sm"
-              className="text-xs px-3 py-1 h-7 bg-muted/30"
+              className="text-xs px-3 py-1 h-7"
+              onClick={() => setActiveFilter("all")}
             >
               All
             </Button>
-            <Button variant="ghost" size="sm" className="text-xs px-3 py-1 h-7">
+            <Button
+              variant={activeFilter === "unread" ? "default" : "ghost"}
+              size="sm"
+              className="text-xs px-3 py-1 h-7"
+              onClick={() => setActiveFilter("unread")}
+            >
               Unread
+              {mockChats.filter(
+                (chat) => chat.unreadCount > 0 && !chat.isArchived,
+              ).length > 0 && (
+                <span className="ml-1 bg-primary text-primary-foreground rounded-full px-1 text-xs">
+                  {
+                    mockChats.filter(
+                      (chat) => chat.unreadCount > 0 && !chat.isArchived,
+                    ).length
+                  }
+                </span>
+              )}
             </Button>
-            <Button variant="ghost" size="sm" className="text-xs px-3 py-1 h-7">
+            <Button
+              variant={activeFilter === "groups" ? "default" : "ghost"}
+              size="sm"
+              className="text-xs px-3 py-1 h-7"
+              onClick={() => setActiveFilter("groups")}
+            >
               Groups
+              {mockChats.filter((chat) => chat.isGroup && !chat.isArchived)
+                .length > 0 && (
+                <span className="ml-1 bg-primary text-primary-foreground rounded-full px-1 text-xs">
+                  {
+                    mockChats.filter((chat) => chat.isGroup && !chat.isArchived)
+                      .length
+                  }
+                </span>
+              )}
             </Button>
-            <Button variant="ghost" size="sm" className="text-xs px-3 py-1 h-7">
+            <Button
+              variant={activeFilter === "archived" ? "default" : "ghost"}
+              size="sm"
+              className="text-xs px-3 py-1 h-7"
+              onClick={() => setActiveFilter("archived")}
+            >
               <Archive className="h-3 w-3 mr-1" />
               Archived
+              {mockChats.filter((chat) => chat.isArchived).length > 0 && (
+                <span className="ml-1 bg-primary text-primary-foreground rounded-full px-1 text-xs">
+                  {mockChats.filter((chat) => chat.isArchived).length}
+                </span>
+              )}
             </Button>
           </div>
         </div>
