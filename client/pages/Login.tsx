@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,8 +15,65 @@ import { Separator } from "@/components/ui/separator";
 import { MessageCircle, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Form states
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [guestUsername, setGuestUsername] = useState("");
+
+  const handleLogin = () => {
+    if (!email || !password) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    // Save authenticated user data
+    localStorage.setItem("userType", "registered");
+    localStorage.setItem("username", email.split("@")[0]);
+    localStorage.setItem("isAuthenticated", "true");
+
+    // Redirect to gender selection
+    navigate("/gender-selection");
+  };
+
+  const handleSignup = () => {
+    if (!email || !password || !confirmPassword || !username) {
+      alert("Please fill in all fields");
+      return;
+    }
+    if (password !== confirmPassword) {
+      alert("Passwords don't match");
+      return;
+    }
+
+    // Save new user data
+    localStorage.setItem("userType", "registered");
+    localStorage.setItem("username", username);
+    localStorage.setItem("isAuthenticated", "true");
+
+    // Redirect to gender selection
+    navigate("/gender-selection");
+  };
+
+  const handleGuestLogin = () => {
+    if (!guestUsername.trim()) {
+      alert("Please enter a username for guest access");
+      return;
+    }
+
+    // Save guest user data
+    localStorage.setItem("userType", "guest");
+    localStorage.setItem("username", guestUsername);
+    localStorage.setItem("isAuthenticated", "true");
+
+    // Redirect to gender selection
+    navigate("/gender-selection");
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-brand-purple/5 flex items-center justify-center p-4">
