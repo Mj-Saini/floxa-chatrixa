@@ -429,7 +429,7 @@ export default function ChatInterface() {
       </div>
 
       {/* Message Input */}
-      <div className="p-4 border-t border-border/50">
+      <div className="p-4 border-t border-border/50 bg-background sticky bottom-0">
         <div className="flex items-center space-x-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
