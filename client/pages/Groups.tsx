@@ -34,7 +34,7 @@ export default function Groups() {
       id: "1",
       name: "Tech Team",
       avatar: "",
-      lastMessage: "The new update looks great! 🚀",
+      lastMessage: "The new update looks great! ���",
       timestamp: "2024-01-15T09:45:00Z",
       unreadCount: 12,
       isOnline: false,
@@ -250,9 +250,44 @@ export default function Groups() {
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <p className="text-sm text-muted-foreground truncate">
+                      <p className="text-sm text-muted-foreground truncate flex-1 mr-2">
                         {group.description || "Group created successfully!"}
                       </p>
+                      <div className="flex items-center space-x-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 px-2"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/chat/${group.id}`);
+                          }}
+                        >
+                          💬
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 px-2"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // Handle group voice call
+                          }}
+                        >
+                          📞
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 px-2"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // Handle group video call
+                          }}
+                        >
+                          📹
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -292,7 +327,7 @@ export default function Groups() {
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <p className="text-sm text-muted-foreground truncate">
+                      <p className="text-sm text-muted-foreground truncate flex-1 mr-2">
                         {group.lastSender && (
                           <span className="text-primary">
                             {group.lastSender}:{" "}
@@ -300,14 +335,49 @@ export default function Groups() {
                         )}
                         {group.lastMessage}
                       </p>
-                      {group.unreadCount > 0 && (
-                        <Badge
-                          variant="default"
-                          className="ml-2 h-5 w-5 p-0 text-xs bg-primary rounded-full"
+                      <div className="flex items-center space-x-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 px-2"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/chat/${group.id}`);
+                          }}
                         >
-                          {group.unreadCount}
-                        </Badge>
-                      )}
+                          💬
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 px-2"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // Handle group voice call
+                          }}
+                        >
+                          📞
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 px-2"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // Handle group video call
+                          }}
+                        >
+                          📹
+                        </Button>
+                        {group.unreadCount > 0 && (
+                          <Badge
+                            variant="default"
+                            className="h-5 w-5 p-0 text-xs bg-primary rounded-full"
+                          >
+                            {group.unreadCount}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
