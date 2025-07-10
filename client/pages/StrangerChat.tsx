@@ -209,9 +209,23 @@ export default function StrangerChat() {
                         <div className="w-2 h-2 bg-green-500 rounded-full mr-2" />
                         Connected
                       </Badge>
-                      <Button variant="ghost" size="sm">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>View Profile</DropdownMenuItem>
+                          <DropdownMenuItem>
+                            Mute Notifications
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>Clear Chat</DropdownMenuItem>
+                          <DropdownMenuItem className="text-destructive">
+                            Report User
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </>
                   )}
                 </div>
@@ -305,9 +319,9 @@ export default function StrangerChat() {
                       ) : (
                         <div className="flex items-end space-x-2 max-w-[70%]">
                           {message.sender === "stranger" && (
-                            <Avatar className="h-8 w-8">
+                            <Avatar className="h-8 w-8 cursor-pointer hover:opacity-80 transition-opacity">
                               <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white text-sm">
-                                S
+                                {strangerInfo.name[0]?.toUpperCase() || "S"}
                               </AvatarFallback>
                             </Avatar>
                           )}
@@ -340,7 +354,7 @@ export default function StrangerChat() {
                       <div className="flex items-end space-x-2 max-w-[70%]">
                         <Avatar className="h-8 w-8">
                           <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white text-sm">
-                            S
+                            {strangerInfo.name[0]?.toUpperCase() || "S"}
                           </AvatarFallback>
                         </Avatar>
                         <div className="px-4 py-3 rounded-2xl bg-muted">
