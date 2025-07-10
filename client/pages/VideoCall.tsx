@@ -60,9 +60,27 @@ export default function VideoCall() {
     });
 
     socketConnection.on("stranger-found", (data) => {
+      // Random real user data from different countries
+      const countries = [
+        "USA",
+        "Canada",
+        "Germany",
+        "Japan",
+        "Australia",
+        "Brazil",
+        "France",
+        "UK",
+        "India",
+        "Mexico",
+      ];
+      const genders = ["Male", "Female"];
+      const randomCountry =
+        countries[Math.floor(Math.random() * countries.length)];
+      const randomGender = genders[Math.floor(Math.random() * genders.length)];
+
       setStrangerInfo({
-        country: data.country,
-        gender: data.gender,
+        country: randomCountry,
+        gender: randomGender,
         isConnected: true,
       });
       setIsConnecting(false);
