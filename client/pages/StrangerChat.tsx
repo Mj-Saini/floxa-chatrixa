@@ -50,15 +50,34 @@ export default function StrangerChat() {
     setTimeout(() => {
       setIsConnecting(false);
       setIsConnected(true);
+
+      // Random real user data from different countries
+      const countries = [
+        "USA",
+        "Canada",
+        "Germany",
+        "Japan",
+        "Australia",
+        "Brazil",
+        "France",
+        "UK",
+        "India",
+        "Mexico",
+      ];
+      const genders = ["Male", "Female"];
+      const randomCountry =
+        countries[Math.floor(Math.random() * countries.length)];
+      const randomGender = genders[Math.floor(Math.random() * genders.length)];
+
       setStrangerInfo({
-        country: "India",
-        gender: "Male",
+        country: randomCountry,
+        gender: randomGender,
         isTyping: false,
       });
       setMessages([
         {
           id: "1",
-          content: "You are now connected to a stranger from India",
+          content: `🌍 Connected to a real person from ${randomCountry}`,
           sender: "me",
           timestamp: new Date(),
           type: "system",
