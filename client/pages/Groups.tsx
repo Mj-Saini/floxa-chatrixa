@@ -208,6 +208,54 @@ export default function Groups() {
             </div>
 
             <div className="space-y-1">
+              {/* Show created groups first */}
+              {createdGroups.map((group) => (
+                <div
+                  key={group.id}
+                  className="flex items-center p-3 hover:bg-muted/30 cursor-pointer rounded-lg transition-colors bg-primary/5 border border-primary/20"
+                  onClick={() => handleGroupClick(group.id)}
+                >
+                  {/* Avatar */}
+                  <div className="relative mr-3">
+                    <Avatar className="h-12 w-12">
+                      <AvatarFallback className="bg-gradient-to-br from-green-500 to-emerald-500 text-white font-semibold">
+                        {group.name
+                          .split(" ")
+                          .map((n: string) => n[0])
+                          .join("")
+                          .toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+
+                  {/* Group Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center space-x-2">
+                        <h3 className="font-medium truncate">{group.name}</h3>
+                        <Crown className="h-3 w-3 text-yellow-500" />
+                        <Badge
+                          variant="secondary"
+                          className="text-xs bg-green-500/20 text-green-400"
+                        >
+                          New
+                        </Badge>
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {group.members.length + 1} members
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-muted-foreground truncate">
+                        {group.description || "Group created successfully!"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Show existing groups */}
               {filteredGroups.map((group) => (
                 <div
                   key={group.id}
