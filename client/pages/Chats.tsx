@@ -5,12 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Filter, Archive, MessageCircle, Users } from "lucide-react";
 
-export default function Chats() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState("all");
-  const [chats, setChats] = useState(mockChats);
-
-  const mockChats = [
+const mockChats = [
     {
       id: "1",
       name: "Sarah Johnson",
