@@ -321,7 +321,7 @@ export default function StrangerChat() {
                           {message.sender === "stranger" && (
                             <Avatar className="h-8 w-8 cursor-pointer hover:opacity-80 transition-opacity">
                               <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white text-sm">
-                                {strangerInfo.name[0]?.toUpperCase() || "S"}
+                                {strangerInfo.name?.[0]?.toUpperCase() || "S"}
                               </AvatarFallback>
                             </Avatar>
                           )}
@@ -354,7 +354,7 @@ export default function StrangerChat() {
                       <div className="flex items-end space-x-2 max-w-[70%]">
                         <Avatar className="h-8 w-8">
                           <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white text-sm">
-                            {strangerInfo.name[0]?.toUpperCase() || "S"}
+                            {strangerInfo.name?.[0]?.toUpperCase() || "S"}
                           </AvatarFallback>
                         </Avatar>
                         <div className="px-4 py-3 rounded-2xl bg-muted">
