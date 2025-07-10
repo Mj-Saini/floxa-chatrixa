@@ -152,7 +152,7 @@ export default function ChatInterface() {
     "👉",
     "👆",
     "👇",
-    "☝��",
+    "☝️",
     "✋",
     "🤚",
     "🖐",
@@ -613,9 +613,31 @@ export default function ChatInterface() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="ghost" size="sm">
-            <Smile className="h-5 w-5" />
-          </Button>
+          <div className="relative">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            >
+              <Smile className="h-5 w-5" />
+            </Button>
+
+            {showEmojiPicker && (
+              <div className="absolute bottom-12 left-0 bg-background border border-border rounded-lg p-4 shadow-lg z-10 w-80 max-h-60 overflow-y-auto">
+                <div className="grid grid-cols-10 gap-2">
+                  {emojis.map((emoji, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleEmojiClick(emoji)}
+                      className="text-2xl hover:bg-muted rounded p-1 transition-colors"
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
 
           <Input
             value={newMessage}
