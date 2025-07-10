@@ -310,20 +310,64 @@ export default function ChatInterface() {
   };
 
   const handleFileUpload = (type: string) => {
-    // Simulate file upload
-    const fileMessage: Message = {
-      id: Date.now().toString(),
-      content:
-        type === "image"
-          ? "📷 Image shared"
-          : type === "file"
-            ? "📄 Document shared"
-            : "🎵 Audio message",
-      sender: "me",
-      timestamp: new Date(),
-      type: type as "image" | "file" | "audio",
-    };
-    setMessages((prev) => [...prev, fileMessage]);
+    if (type === "camera") {
+      cameraInputRef.current?.click();
+    } else if (type === "gallery") {
+      galleryInputRef.current?.click();
+    } else {
+      // Simulate file upload
+      const fileMessage: Message = {
+        id: Date.now().toString(),
+        content:
+          type === "image"
+            ? "📷 Image shared"
+            : type === "file"
+              ? "📄 Document shared"
+              : "🎵 Audio message",
+        sender: "me",
+        timestamp: new Date(),
+        type: type as "image" | "file" | "audio",
+      };
+      setMessages((prev) => [...prev, fileMessage]);
+    }
+  };
+
+  const handleEmojiClick = (emoji: string) => {
+    setNewMessage((prev) => prev + emoji);
+    setShowEmojiPicker(false);
+  };
+
+  const handleCameraCapture = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const imageMessage: Message = {
+        id: Date.now().toString(),
+        content: `📷 Photo captured: ${file.name}`,
+        sender: "me",
+        timestamp: new Date(),
+        type: "image",
+      };
+      setMessages((prev) => [...prev, imageMessage]);
+    }
+  };
+
+  const handleGallerySelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const fileType = file.type.startsWith("image/")
+        ? "image"
+        : file.type.startsWith("video/")
+          ? "image"
+          : "file";
+      const fileMessage: Message = {
+        id: Date.now().toString(),
+        content: `📎 File shared: ${file.name}`,
+        sender: "me",
+        timestamp: new Date(),
+        type: fileType as "image" | "file",
+      };
+      setMessages((prev) => [...prev, fileMessage]);
+    }
   };
 
   const formatTime = (date: Date) => {
