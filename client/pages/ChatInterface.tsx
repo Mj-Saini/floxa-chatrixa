@@ -304,19 +304,14 @@ export default function ChatInterface() {
       cameraInputRef.current?.click();
     } else if (type === "gallery") {
       galleryInputRef.current?.click();
-    } else {
-      // Simulate file upload
+    } else if (type === "audio") {
+      // Simulate audio message
       const fileMessage: Message = {
         id: Date.now().toString(),
-        content:
-          type === "image"
-            ? "📷 Image shared"
-            : type === "file"
-              ? "📄 Document shared"
-              : "🎵 Audio message",
+        content: "🎵 Audio message",
         sender: "me",
         timestamp: new Date(),
-        type: type as "image" | "file" | "audio",
+        type: "audio",
       };
       setMessages((prev) => [...prev, fileMessage]);
     }
@@ -324,7 +319,7 @@ export default function ChatInterface() {
 
   const handleEmojiClick = (emoji: string) => {
     setNewMessage((prev) => prev + emoji);
-    setShowEmojiPicker(false);
+    // Keep emoji picker open for multiple selections
   };
 
   const handleCameraCapture = (event: React.ChangeEvent<HTMLInputElement>) => {
