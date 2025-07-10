@@ -294,11 +294,43 @@ export default function Chats() {
         {filteredChats.length === 0 && (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium mb-2">No chats found</h3>
-              <p className="text-muted-foreground">
-                Try adjusting your search or start a new conversation
-              </p>
+              {activeFilter === "unread" ? (
+                <>
+                  <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-medium mb-2">
+                    No unread messages
+                  </h3>
+                  <p className="text-muted-foreground">
+                    You're all caught up! All messages have been read.
+                  </p>
+                </>
+              ) : activeFilter === "groups" ? (
+                <>
+                  <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-medium mb-2">No groups found</h3>
+                  <p className="text-muted-foreground">
+                    Join a group or create one to start group conversations.
+                  </p>
+                </>
+              ) : activeFilter === "archived" ? (
+                <>
+                  <Archive className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-medium mb-2">
+                    No archived chats
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Archived conversations will appear here.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-medium mb-2">No chats found</h3>
+                  <p className="text-muted-foreground">
+                    Try adjusting your search or start a new conversation
+                  </p>
+                </>
+              )}
             </div>
           </div>
         )}
