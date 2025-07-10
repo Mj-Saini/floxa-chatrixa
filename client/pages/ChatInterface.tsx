@@ -58,6 +58,7 @@ export default function ChatInterface() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
+  const audioInputRef = useRef<HTMLInputElement>(null);
 
   const emojis = [
     "😀",
@@ -305,15 +306,7 @@ export default function ChatInterface() {
     } else if (type === "gallery") {
       galleryInputRef.current?.click();
     } else if (type === "audio") {
-      // Simulate audio message
-      const fileMessage: Message = {
-        id: Date.now().toString(),
-        content: "🎵 Audio message",
-        sender: "me",
-        timestamp: new Date(),
-        type: "audio",
-      };
-      setMessages((prev) => [...prev, fileMessage]);
+      audioInputRef.current?.click();
     }
   };
 
@@ -346,12 +339,26 @@ export default function ChatInterface() {
           : "file";
       const fileMessage: Message = {
         id: Date.now().toString(),
-        content: `📎 File shared: ${file.name}`,
+        content: `📎 ${fileType === "image" ? "Photo/Video" : "File"} shared: ${file.name}`,
         sender: "me",
         timestamp: new Date(),
         type: fileType as "image" | "file",
       };
       setMessages((prev) => [...prev, fileMessage]);
+    }
+  };
+
+  const handleAudioSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const audioMessage: Message = {
+        id: Date.now().toString(),
+        content: `🎵 Audio shared: ${file.name}`,
+        sender: "me",
+        timestamp: new Date(),
+        type: "audio",
+      };
+      setMessages((prev) => [...prev, audioMessage]);
     }
   };
 
@@ -538,13 +545,18 @@ export default function ChatInterface() {
             </Button>
 
             {showEmojiPicker && (
-              <div className="absolute bottom-12 left-0 bg-background border border-border rounded-lg p-4 shadow-lg z-10 w-80 max-h-60 overflow-y-auto">
-                <div className="grid grid-cols-10 gap-2">
+              <div className="absolute bottom-12 left-0 bg-background border border-border rounded-lg p-4 shadow-lg z-50 w-80 max-h-60 overflow-y-auto">
+                <div className="grid grid-cols-10 gap-1">
                   {emojis.map((emoji, index) => (
                     <button
                       key={index}
-                      onClick={() => handleEmojiClick(emoji)}
-                      className="text-2xl hover:bg-muted rounded p-1 transition-colors"
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleEmojiClick(emoji);
+                      }}
+                      className="text-2xl hover:bg-muted rounded p-2 transition-colors cursor-pointer"
                     >
                       {emoji}
                     </button>
@@ -583,6 +595,14 @@ export default function ChatInterface() {
         className="hidden"
         accept="image/*,video/*,.pdf,.doc,.docx"
         onChange={handleGallerySelect}
+      />
+
+      <input
+        ref={audioInputRef}
+        type="file"
+        className="hidden"
+        accept="audio/*,.mp3,.wav,.aac,.ogg,.flac,.m4a"
+        onChange={handleAudioSelect}
       />
     </div>
   );

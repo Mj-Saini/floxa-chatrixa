@@ -35,6 +35,8 @@ export default function StrangerChat() {
     country: "Unknown",
     gender: "Unknown",
     isTyping: false,
+    name: "Stranger",
+    avatar: "",
   });
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -92,7 +94,9 @@ export default function StrangerChat() {
     setStrangerInfo({
       country: "Unknown",
       gender: "Unknown",
+      name: "Stranger",
       isTyping: false,
+      avatar: "",
     });
   };
 
