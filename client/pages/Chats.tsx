@@ -6,175 +6,180 @@ import { Button } from "@/components/ui/button";
 import { Search, Filter, Archive, MessageCircle, Users } from "lucide-react";
 
 const mockChats = [
-    {
-      id: "1",
-      name: "Sarah Johnson",
-      avatar: "",
-      lastMessage: "Hey! How are you doing today?",
-      timestamp: "2024-01-15T10:30:00Z",
-      unreadCount: 3,
-      isOnline: true,
-      messageType: "text" as const,
-      isTyping: false,
-      isPinned: true,
-      isMuted: false,
-      isRead: false,
-      isGroup: false,
-      isArchived: false,
-    },
-    {
-      id: "2",
-      name: "Tech Team",
-      avatar: "",
-      lastMessage: "The new update looks great! 🚀",
-      timestamp: "2024-01-15T09:45:00Z",
-      unreadCount: 12,
-      isOnline: false,
-      messageType: "text" as const,
-      isTyping: true,
-      isPinned: false,
-      isMuted: false,
-      isRead: false,
-      isGroup: true,
-      lastSender: "Mike",
-      isArchived: false,
-    },
-    {
-      id: "3",
-      name: "Alex Rodriguez",
-      avatar: "",
-      lastMessage: "Voice message",
-      timestamp: "2024-01-15T08:20:00Z",
-      unreadCount: 1,
-      isOnline: true,
-      messageType: "voice" as const,
-      isTyping: false,
-      isPinned: false,
-      isMuted: false,
-      isRead: false,
-      isGroup: false,
-      isArchived: false,
-    },
-    {
-      id: "4",
-      name: "Design Squad",
-      avatar: "",
-      lastMessage: "Check out this new mockup",
-      timestamp: "2024-01-15T07:15:00Z",
-      unreadCount: 0,
-      isOnline: false,
-      messageType: "image" as const,
-      isTyping: false,
-      isPinned: false,
-      isMuted: true,
-      isRead: true,
-      isGroup: true,
-      lastSender: "Emma",
-      isArchived: false,
-    },
-    {
-      id: "5",
-      name: "John Smith",
-      avatar: "",
-      lastMessage: "Thanks for the help with the project!",
-      timestamp: "2024-01-14T22:30:00Z",
-      unreadCount: 0,
-      isOnline: false,
-      messageType: "text" as const,
-      isTyping: false,
-      isPinned: false,
-      isMuted: false,
-      isRead: true,
-      isGroup: false,
-      isArchived: false,
-    },
-    {
-      id: "6",
-      name: "Family Group",
-      avatar: "",
-      lastMessage: "Don't forget about dinner tomorrow!",
-      timestamp: "2024-01-14T20:45:00Z",
-      unreadCount: 5,
-      isOnline: false,
-      messageType: "text" as const,
-      isTyping: false,
-      isPinned: true,
-      isMuted: false,
-      isRead: false,
-      isGroup: true,
-      lastSender: "Mom",
-      isArchived: false,
-    },
-    {
-      id: "7",
-      name: "Lisa Chen",
-      avatar: "",
-      lastMessage: "Project_final.pdf",
-      timestamp: "2024-01-14T18:20:00Z",
-      unreadCount: 0,
-      isOnline: true,
-      messageType: "file" as const,
-      isTyping: false,
-      isPinned: false,
-      isMuted: false,
-      isRead: true,
-      isGroup: false,
-      isArchived: false,
-    },
-    {
-      id: "8",
-      name: "Book Club",
-      avatar: "",
-      lastMessage: "What did everyone think of chapter 5?",
-      timestamp: "2024-01-14T16:10:00Z",
-      unreadCount: 2,
-      isOnline: false,
-      messageType: "text" as const,
-      isTyping: false,
-      isPinned: false,
-      isMuted: false,
-      isRead: false,
-      isGroup: true,
-      lastSender: "David",
-      isArchived: false,
-    },
-    {
-      id: "9",
-      name: "Old Project Team",
-      avatar: "",
-      lastMessage: "Great working with you all!",
-      timestamp: "2024-01-10T14:20:00Z",
-      unreadCount: 0,
-      isOnline: false,
-      messageType: "text" as const,
-      isTyping: false,
-      isPinned: false,
-      isMuted: false,
-      isRead: true,
-      isGroup: true,
-      lastSender: "Tom",
-      isArchived: true,
-    },
-    {
-      id: "10",
-      name: "Emma Wilson",
-      avatar: "",
-      lastMessage: "See you next time!",
-      timestamp: "2024-01-08T11:15:00Z",
-      unreadCount: 0,
-      isOnline: false,
-      messageType: "text" as const,
-      isTyping: false,
-      isPinned: false,
-      isMuted: false,
-      isRead: true,
-      isGroup: false,
-      isArchived: true,
-    },
-  ];
+  {
+    id: "1",
+    name: "Sarah Johnson",
+    avatar: "",
+    lastMessage: "Hey! How are you doing today?",
+    timestamp: "2024-01-15T10:30:00Z",
+    unreadCount: 3,
+    isOnline: true,
+    messageType: "text" as const,
+    isTyping: false,
+    isPinned: true,
+    isMuted: false,
+    isRead: false,
+    isGroup: false,
+    isArchived: false,
+  },
+  {
+    id: "2",
+    name: "Tech Team",
+    avatar: "",
+    lastMessage: "The new update looks great! 🚀",
+    timestamp: "2024-01-15T09:45:00Z",
+    unreadCount: 12,
+    isOnline: false,
+    messageType: "text" as const,
+    isTyping: true,
+    isPinned: false,
+    isMuted: false,
+    isRead: false,
+    isGroup: true,
+    lastSender: "Mike",
+    isArchived: false,
+  },
+  {
+    id: "3",
+    name: "Alex Rodriguez",
+    avatar: "",
+    lastMessage: "Voice message",
+    timestamp: "2024-01-15T08:20:00Z",
+    unreadCount: 1,
+    isOnline: true,
+    messageType: "voice" as const,
+    isTyping: false,
+    isPinned: false,
+    isMuted: false,
+    isRead: false,
+    isGroup: false,
+    isArchived: false,
+  },
+  {
+    id: "4",
+    name: "Design Squad",
+    avatar: "",
+    lastMessage: "Check out this new mockup",
+    timestamp: "2024-01-15T07:15:00Z",
+    unreadCount: 0,
+    isOnline: false,
+    messageType: "image" as const,
+    isTyping: false,
+    isPinned: false,
+    isMuted: true,
+    isRead: true,
+    isGroup: true,
+    lastSender: "Emma",
+    isArchived: false,
+  },
+  {
+    id: "5",
+    name: "John Smith",
+    avatar: "",
+    lastMessage: "Thanks for the help with the project!",
+    timestamp: "2024-01-14T22:30:00Z",
+    unreadCount: 0,
+    isOnline: false,
+    messageType: "text" as const,
+    isTyping: false,
+    isPinned: false,
+    isMuted: false,
+    isRead: true,
+    isGroup: false,
+    isArchived: false,
+  },
+  {
+    id: "6",
+    name: "Family Group",
+    avatar: "",
+    lastMessage: "Don't forget about dinner tomorrow!",
+    timestamp: "2024-01-14T20:45:00Z",
+    unreadCount: 5,
+    isOnline: false,
+    messageType: "text" as const,
+    isTyping: false,
+    isPinned: true,
+    isMuted: false,
+    isRead: false,
+    isGroup: true,
+    lastSender: "Mom",
+    isArchived: false,
+  },
+  {
+    id: "7",
+    name: "Lisa Chen",
+    avatar: "",
+    lastMessage: "Project_final.pdf",
+    timestamp: "2024-01-14T18:20:00Z",
+    unreadCount: 0,
+    isOnline: true,
+    messageType: "file" as const,
+    isTyping: false,
+    isPinned: false,
+    isMuted: false,
+    isRead: true,
+    isGroup: false,
+    isArchived: false,
+  },
+  {
+    id: "8",
+    name: "Book Club",
+    avatar: "",
+    lastMessage: "What did everyone think of chapter 5?",
+    timestamp: "2024-01-14T16:10:00Z",
+    unreadCount: 2,
+    isOnline: false,
+    messageType: "text" as const,
+    isTyping: false,
+    isPinned: false,
+    isMuted: false,
+    isRead: false,
+    isGroup: true,
+    lastSender: "David",
+    isArchived: false,
+  },
+  {
+    id: "9",
+    name: "Old Project Team",
+    avatar: "",
+    lastMessage: "Great working with you all!",
+    timestamp: "2024-01-10T14:20:00Z",
+    unreadCount: 0,
+    isOnline: false,
+    messageType: "text" as const,
+    isTyping: false,
+    isPinned: false,
+    isMuted: false,
+    isRead: true,
+    isGroup: true,
+    lastSender: "Tom",
+    isArchived: true,
+  },
+  {
+    id: "10",
+    name: "Emma Wilson",
+    avatar: "",
+    lastMessage: "See you next time!",
+    timestamp: "2024-01-08T11:15:00Z",
+    unreadCount: 0,
+    isOnline: false,
+    messageType: "text" as const,
+    isTyping: false,
+    isPinned: false,
+    isMuted: false,
+    isRead: true,
+    isGroup: false,
+    isArchived: true,
+  },
+];
+
+export default function Chats() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [chats, setChats] = useState(mockChats);
 
   const getFilteredChats = () => {
-    let filtered = mockChats.filter(
+    let filtered = chats.filter(
       (chat) =>
         chat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         chat.lastMessage.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -243,12 +248,11 @@ const mockChats = [
               onClick={() => setActiveFilter("unread")}
             >
               Unread
-              {mockChats.filter(
-                (chat) => chat.unreadCount > 0 && !chat.isArchived,
-              ).length > 0 && (
+              {chats.filter((chat) => chat.unreadCount > 0 && !chat.isArchived)
+                .length > 0 && (
                 <span className="ml-1 bg-primary text-primary-foreground rounded-full px-1 text-xs">
                   {
-                    mockChats.filter(
+                    chats.filter(
                       (chat) => chat.unreadCount > 0 && !chat.isArchived,
                     ).length
                   }
@@ -262,11 +266,11 @@ const mockChats = [
               onClick={() => setActiveFilter("groups")}
             >
               Groups
-              {mockChats.filter((chat) => chat.isGroup && !chat.isArchived)
-                .length > 0 && (
+              {chats.filter((chat) => chat.isGroup && !chat.isArchived).length >
+                0 && (
                 <span className="ml-1 bg-primary text-primary-foreground rounded-full px-1 text-xs">
                   {
-                    mockChats.filter((chat) => chat.isGroup && !chat.isArchived)
+                    chats.filter((chat) => chat.isGroup && !chat.isArchived)
                       .length
                   }
                 </span>
@@ -280,9 +284,9 @@ const mockChats = [
             >
               <Archive className="h-3 w-3 mr-1" />
               Archived
-              {mockChats.filter((chat) => chat.isArchived).length > 0 && (
+              {chats.filter((chat) => chat.isArchived).length > 0 && (
                 <span className="ml-1 bg-primary text-primary-foreground rounded-full px-1 text-xs">
-                  {mockChats.filter((chat) => chat.isArchived).length}
+                  {chats.filter((chat) => chat.isArchived).length}
                 </span>
               )}
             </Button>
