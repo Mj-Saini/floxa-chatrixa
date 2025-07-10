@@ -3,7 +3,7 @@ import ChatTabs from "@/components/ChatTabs";
 import ChatList from "@/components/ChatList";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, Archive } from "lucide-react";
+import { Search, Filter, Archive, MessageCircle, Users } from "lucide-react";
 
 export default function Chats() {
   const [searchQuery, setSearchQuery] = useState("");
