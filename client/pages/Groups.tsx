@@ -177,7 +177,11 @@ export default function Groups() {
         {/* Quick Actions */}
         <div className="p-4 space-y-3 border-b border-border/30">
           <div className="flex space-x-3">
-            <Button className="flex-1" size="sm">
+            <Button
+              className="flex-1"
+              size="sm"
+              onClick={() => navigate("/create-group")}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Create Group
             </Button>
