@@ -51,7 +51,7 @@ const App = () => (
             <Route path="groups" element={<Groups />} />
             <Route path="create-group" element={<CreateGroup />} />
             <Route path="calls" element={<Calls />} />
-            <Route path="status" element={<Status />} />
+            <Route path="status" element={<Navigate to="/chats" replace />} />
 
             {/* Other main pages */}
             <Route path="video-call" element={<VideoCall />} />
