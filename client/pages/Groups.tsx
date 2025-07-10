@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ChatTabs from "@/components/ChatTabs";
 import ChatList from "@/components/ChatList";
 import { Input } from "@/components/ui/input";
