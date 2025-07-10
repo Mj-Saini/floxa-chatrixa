@@ -152,7 +152,7 @@ export default function ChatInterface() {
     "👉",
     "👆",
     "👇",
-    "☝️",
+    "☝��",
     "✋",
     "🤚",
     "🖐",
@@ -598,21 +598,17 @@ export default function ChatInterface() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
-              <DropdownMenuItem onClick={() => handleFileUpload("image")}>
+              <DropdownMenuItem onClick={() => handleFileUpload("camera")}>
+                <Camera className="h-4 w-4 mr-2" />
+                Camera
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleFileUpload("gallery")}>
                 <Image className="h-4 w-4 mr-2" />
                 Photo & Video
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleFileUpload("file")}>
-                <FileText className="h-4 w-4 mr-2" />
-                Document
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleFileUpload("audio")}>
                 <Mic className="h-4 w-4 mr-2" />
                 Audio
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Camera className="h-4 w-4 mr-2" />
-                Camera
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
