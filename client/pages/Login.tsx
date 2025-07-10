@@ -127,6 +127,8 @@ export default function Login() {
                         id="email"
                         type="text"
                         placeholder="Enter your email or username"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         className="pl-10 bg-background/50 border-border/50 focus:border-primary"
                       />
                     </div>
@@ -140,6 +142,8 @@ export default function Login() {
                         id="password"
                         type={showPassword ? "text" : "password"}
                         placeholder="Enter your password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         className="pl-10 pr-10 bg-background/50 border-border/50 focus:border-primary"
                       />
                       <button
