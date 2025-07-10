@@ -47,6 +47,9 @@ export default function Groups() {
       lastSender: "Mike",
       memberCount: 24,
       role: "admin",
+      canMessage: true,
+      canCall: true,
+      canVideoCall: true,
     },
     {
       id: "2",
