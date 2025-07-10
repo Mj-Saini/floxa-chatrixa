@@ -222,7 +222,7 @@ export default function ChatInterface() {
   };
 
   return (
-    <div className="h-screen bg-background flex flex-col">
+    <div className="h-screen bg-background flex flex-col overflow-hidden">
       {/* Chat Header */}
       <div className="flex items-center justify-between p-4 bg-background border-b border-border/50">
         <div className="flex items-center space-x-3">
