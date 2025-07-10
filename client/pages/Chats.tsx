@@ -201,6 +201,13 @@ export default function Chats() {
   const filteredChats = getFilteredChats();
 
   const handleChatClick = (chatId: string) => {
+    // Clear unread count for this chat
+    setChats((prevChats) =>
+      prevChats.map((chat) =>
+        chat.id === chatId ? { ...chat, unreadCount: 0 } : chat,
+      ),
+    );
+
     window.location.href = `/chat/${chatId}`;
   };
 
