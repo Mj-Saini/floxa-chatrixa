@@ -177,11 +177,27 @@ export default function Chats() {
     },
   ];
 
-  const filteredChats = mockChats.filter(
-    (chat) =>
-      chat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      chat.lastMessage.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const getFilteredChats = () => {
+    let filtered = mockChats.filter(
+      (chat) =>
+        chat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        chat.lastMessage.toLowerCase().includes(searchQuery.toLowerCase()),
+    );
+
+    switch (activeFilter) {
+      case "unread":
+        return filtered.filter((chat) => chat.unreadCount > 0);
+      case "groups":
+        return filtered.filter((chat) => chat.isGroup);
+      case "archived":
+        return filtered.filter((chat) => chat.isArchived);
+      case "all":
+      default:
+        return filtered.filter((chat) => !chat.isArchived);
+    }
+  };
+
+  const filteredChats = getFilteredChats();
 
   const handleChatClick = (chatId: string) => {
     console.log("Open chat:", chatId);
