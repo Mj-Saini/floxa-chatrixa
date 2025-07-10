@@ -2,34 +2,24 @@ import React, { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import ChatHeader from "@/components/ChatHeader";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  ArrowLeft,
-  Phone,
-  Video,
-  MoreVertical,
   Send,
   Paperclip,
   Smile,
   Mic,
   Image,
-  FileText,
   Camera,
-  Reply,
   Copy,
   Edit,
   Trash,
-  Check,
   CheckCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -382,79 +372,9 @@ export default function ChatInterface() {
   };
 
   return (
-    <div className="h-screen bg-background flex flex-col overflow-hidden">
+    <div className="h-screen bg-background flex flex-col">
       {/* Chat Header */}
-      <div className="flex items-center justify-between p-4 bg-background border-b border-border/50">
-        <div className="flex items-center space-x-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate("/chats")}
-            className="p-2"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div
-            className="flex items-center space-x-3 cursor-pointer hover:bg-muted/50 p-2 rounded-lg transition-colors"
-            onClick={handleProfileClick}
-          >
-            <div className="relative">
-              <Avatar className="h-10 w-10">
-                <AvatarImage src={chatUser.avatar} alt={chatUser.name} />
-                <AvatarFallback className="bg-gradient-to-br from-primary to-brand-pink text-white font-semibold">
-                  {chatUser.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              {chatUser.isOnline && !chatUser.isGroup && (
-                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-background rounded-full" />
-              )}
-            </div>
-            <div>
-              <h3 className="font-medium">{chatUser.name}</h3>
-              <p className="text-sm text-muted-foreground">
-                {chatUser.isGroup
-                  ? `${chatUser.members} members`
-                  : isTyping
-                    ? "typing..."
-                    : chatUser.isOnline
-                      ? "online"
-                      : `last seen ${chatUser.lastSeen}`}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Button variant="ghost" size="sm">
-            <Phone className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="sm">
-            <Video className="h-5 w-5" />
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm">
-                <MoreVertical className="h-5 w-5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>View Profile</DropdownMenuItem>
-              <DropdownMenuItem>Media & Files</DropdownMenuItem>
-              <DropdownMenuItem>Search Messages</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Mute Notifications</DropdownMenuItem>
-              <DropdownMenuItem>Clear Chat</DropdownMenuItem>
-              <DropdownMenuItem className="text-destructive">
-                Block User
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
+      <ChatHeader user={chatUser} isTyping={isTyping} />
 
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">

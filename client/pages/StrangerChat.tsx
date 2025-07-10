@@ -46,7 +46,7 @@ export default function StrangerChat() {
 
   const handleConnect = () => {
     setIsConnecting(true);
-    // Simulate connection process
+    // Simulate finding real user worldwide
     setTimeout(() => {
       setIsConnecting(false);
       setIsConnected(true);

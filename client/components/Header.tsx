@@ -29,8 +29,10 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const isAuthPage = location.pathname === "/login";
+  const isHomepage = location.pathname === "/";
+  const isChatInterface = location.pathname.startsWith("/chat/");
 
-  if (isAuthPage) {
+  if (isAuthPage || isChatInterface) {
     return null;
   }
 
@@ -39,7 +41,6 @@ export default function Header() {
     { href: "/stranger-chat", label: "Chat", icon: MessageCircle },
     { href: "/video-call", label: "Video", icon: Video },
     { href: "/chats", label: "Messages", icon: Users },
-    { href: "/profile", label: "Profile", icon: User },
   ];
 
   return (
@@ -56,40 +57,42 @@ export default function Header() {
             </span>
           </Link>
 
-          {/* Instagram-style Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive =
-                location.pathname === item.href ||
-                (item.href === "/" && location.pathname === "/");
-              return (
-                <Link key={item.href} to={item.href}>
-                  <div className="flex flex-col items-center space-y-1 p-2 rounded-lg hover:bg-muted/50 transition-colors">
-                    <Icon
-                      className={cn(
-                        "h-6 w-6 transition-colors",
-                        isActive
-                          ? "text-primary"
-                          : "text-muted-foreground hover:text-foreground",
+          {/* Instagram-style Navigation - Only on homepage */}
+          {isHomepage && (
+            <nav className="hidden md:flex items-center space-x-6">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const isActive =
+                  location.pathname === item.href ||
+                  (item.href === "/" && location.pathname === "/");
+                return (
+                  <Link key={item.href} to={item.href}>
+                    <div className="flex flex-col items-center space-y-1 p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                      <Icon
+                        className={cn(
+                          "h-6 w-6 transition-colors",
+                          isActive
+                            ? "text-primary"
+                            : "text-muted-foreground hover:text-foreground",
+                        )}
+                      />
+                      <span
+                        className={cn(
+                          "text-xs font-medium transition-colors",
+                          isActive ? "text-primary" : "text-muted-foreground",
+                        )}
+                      >
+                        {item.label}
+                      </span>
+                      {isActive && (
+                        <div className="w-1 h-1 bg-primary rounded-full" />
                       )}
-                    />
-                    <span
-                      className={cn(
-                        "text-xs font-medium transition-colors",
-                        isActive ? "text-primary" : "text-muted-foreground",
-                      )}
-                    >
-                      {item.label}
-                    </span>
-                    {isActive && (
-                      <div className="w-1 h-1 bg-primary rounded-full" />
-                    )}
-                  </div>
-                </Link>
-              );
-            })}
-          </nav>
+                    </div>
+                  </Link>
+                );
+              })}
+            </nav>
+          )}
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-3">
@@ -198,10 +201,10 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
-        {isMobileMenuOpen && (
+        {/* Mobile Navigation - Only on homepage */}
+        {isMobileMenuOpen && isHomepage && (
           <div className="md:hidden border-t border-border/50 py-4">
-            <nav className="grid grid-cols-5 gap-4">
+            <nav className="grid grid-cols-4 gap-4">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive =
