@@ -200,8 +200,7 @@ export default function Chats() {
   const filteredChats = getFilteredChats();
 
   const handleChatClick = (chatId: string) => {
-    console.log("Open chat:", chatId);
-    // Navigate to chat detail view
+    window.location.href = `/chat/${chatId}`;
   };
 
   return (
