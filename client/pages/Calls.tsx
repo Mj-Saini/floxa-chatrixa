@@ -285,20 +285,10 @@ export default function Calls() {
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
                 <PhoneCall className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">No calls yet</h3>
-                <p className="text-muted-foreground mb-4">
-                  Start your first voice or video call
+                <h3 className="text-lg font-medium mb-2">No call history</h3>
+                <p className="text-muted-foreground">
+                  Your call history will appear here once you make calls
                 </p>
-                <div className="flex space-x-2 justify-center">
-                  <Button size="sm">
-                    <Video className="h-4 w-4 mr-2" />
-                    Video Call
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Phone className="h-4 w-4 mr-2" />
-                    Voice Call
-                  </Button>
-                </div>
               </div>
             </div>
           )}
