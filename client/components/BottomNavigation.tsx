@@ -8,10 +8,10 @@ export default function BottomNavigation() {
   const location = useLocation();
 
   const navItems = [
-    { href: "/", label: "Home", icon: MessageCircle },
-    { href: "/stranger-chat", label: "Chat", icon: MessageCircle },
-    { href: "/video-call", label: "Video", icon: Video },
-    { href: "/chats", label: "Messages", icon: Users, badge: 3 },
+    { href: "/home", label: "Home", icon: MessageCircle },
+    { href: "/home/stranger-chat", label: "Chat", icon: MessageCircle },
+    { href: "/home/video-call", label: "Video", icon: Video },
+    { href: "/home/chats", label: "Messages", icon: Users, badge: 3 },
   ];
 
   return (
@@ -21,7 +21,7 @@ export default function BottomNavigation() {
           const Icon = item.icon;
           const isActive =
             location.pathname === item.href ||
-            (item.href === "/" && location.pathname === "/");
+            (item.href === "/home" && location.pathname === "/home");
 
           return (
             <Link key={item.href} to={item.href}>
