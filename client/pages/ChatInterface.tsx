@@ -560,6 +560,54 @@ export default function ChatInterface() {
                           )}
                         </div>
                       </div>
+                    ) : message.type === "file" && message.fileUrl ? (
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-3 p-3 bg-muted/20 rounded-lg border border-border/30">
+                          <div className="p-2 bg-primary/10 rounded-lg">
+                            <svg
+                              className="h-6 w-6 text-primary"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                              />
+                            </svg>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">
+                              {message.fileName || "Document"}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {message.content}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() =>
+                              window.open(message.fileUrl, "_blank")
+                            }
+                            className="p-1 text-primary hover:bg-primary/10 rounded"
+                          >
+                            <svg
+                              className="h-4 w-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
                     ) : (
                       <p>{message.content}</p>
                     )}
@@ -650,8 +698,8 @@ export default function ChatInterface() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Message Input - Fixed at bottom */}
-      <div className="p-4 border-t border-border/50 bg-background fixed bottom-0 left-0 right-0 z-10">
+      {/* Message Input - Sticky at bottom */}
+      <div className="p-4 border-t border-border/50 bg-background">
         <div className="flex items-center space-x-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
