@@ -285,6 +285,53 @@ export default function Index() {
           </div>
         </section>
       )}
+
+      {/* Guest Upgrade Section - Only for guest users */}
+      {localStorage.getItem("userType") === "guest" && (
+        <section className="py-20 px-4 bg-gradient-to-r from-orange-500/10 to-amber-500/10">
+          <div className="container mx-auto text-center">
+            <div className="max-w-2xl mx-auto space-y-6">
+              <h2 className="text-3xl md:text-4xl font-bold">
+                Unlock Full Features
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                Create a free account to access groups, personal chats, wallet
+                features, and much more!
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+                <div className="bg-background/50 p-6 rounded-lg border border-border/50">
+                  <Users className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <h3 className="font-semibold mb-2">Personal Chats</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Save conversations and chat with friends
+                  </p>
+                </div>
+                <div className="bg-background/50 p-6 rounded-lg border border-border/50">
+                  <UserPlus className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <h3 className="font-semibold mb-2">Groups & Rooms</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Create and join group conversations
+                  </p>
+                </div>
+                <div className="bg-background/50 p-6 rounded-lg border border-border/50">
+                  <Wallet className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <h3 className="font-semibold mb-2">Earn & Rewards</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Get points and convert to real money
+                  </p>
+                </div>
+              </div>
+              <Button
+                size="lg"
+                className="mt-8"
+                onClick={() => (window.location.href = "/login")}
+              >
+                Create Free Account
+              </Button>
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
