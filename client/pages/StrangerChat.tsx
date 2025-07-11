@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import PageHeader from "@/components/PageHeader";
+
 import {
   MessageCircle,
   Send,
@@ -301,13 +301,9 @@ export default function StrangerChat() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <PageHeader
-        title="Talk to Stranger"
-        subtitle="Connect with people worldwide through anonymous text chat"
-      />
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="flex flex-col h-[calc(100vh-16rem)]">
+    <div className="h-screen bg-background flex flex-col">
+      <div className="flex-1 container mx-auto px-4 py-4 max-w-4xl flex flex-col">
+        <div className="flex flex-col h-full">
           {/* Header */}
           <Card className="bg-card/50 backdrop-blur-sm border-border/50 mb-4">
             <CardHeader className="pb-3">
