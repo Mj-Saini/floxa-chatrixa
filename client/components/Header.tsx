@@ -36,12 +36,34 @@ export default function Header() {
     return null;
   }
 
-  const navItems = [
+  const userType = localStorage.getItem("userType");
+
+  const allNavItems = [
     { href: "/home", label: "Home", icon: MessageCircle },
-    { href: "/home/stranger-chat", label: "Chat", icon: MessageCircle },
-    { href: "/home/video-call", label: "Video", icon: Video },
-    { href: "/home/chats", label: "Messages", icon: Users },
+    {
+      href: "/home/stranger-chat",
+      label: "Chat",
+      icon: MessageCircle,
+      guestAllowed: true,
+    },
+    {
+      href: "/home/video-call",
+      label: "Video",
+      icon: Video,
+      guestAllowed: true,
+    },
+    {
+      href: "/home/chats",
+      label: "Messages",
+      icon: Users,
+      guestAllowed: false,
+    },
   ];
+
+  const navItems =
+    userType === "guest"
+      ? allNavItems.filter((item) => item.guestAllowed)
+      : allNavItems;
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
