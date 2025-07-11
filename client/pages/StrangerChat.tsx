@@ -33,7 +33,10 @@ interface Message {
   content: string;
   sender: "me" | "stranger";
   timestamp: Date;
-  type: "text" | "system";
+  type: "text" | "system" | "image" | "video" | "audio" | "file";
+  fileUrl?: string;
+  fileName?: string;
+  fileSize?: number;
 }
 
 interface StrangerInfo {
@@ -58,6 +61,9 @@ export default function StrangerChat() {
     avatar: "",
   });
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+  const audioInputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -176,6 +182,115 @@ export default function StrangerChat() {
     setTimeout(() => {
       handleConnect();
     }, 1000);
+  };
+
+  const handleFileUpload = (type: string) => {
+    const userType = localStorage.getItem("userType");
+
+    if (userType === "guest") {
+      toast({
+        title: "Feature Restricted",
+        description:
+          "Please create an account to send files, images, and videos.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (type === "camera") {
+      cameraInputRef.current?.click();
+    } else if (type === "gallery") {
+      galleryInputRef.current?.click();
+    } else if (type === "audio") {
+      audioInputRef.current?.click();
+    }
+  };
+
+  const handleCameraCapture = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        let fileType: "image" | "video" = "image";
+        let content = "📷 Photo captured";
+
+        if (file.type.startsWith("video/")) {
+          fileType = "video";
+          content = "🎥 Video captured";
+        }
+
+        const mediaMessage: Message = {
+          id: Date.now().toString(),
+          content,
+          sender: "me",
+          timestamp: new Date(),
+          type: fileType,
+          fileUrl: e.target?.result as string,
+          fileName: file.name,
+          fileSize: file.size,
+        };
+        setMessages((prev) => [...prev, mediaMessage]);
+      };
+      reader.readAsDataURL(file);
+    }
+    event.target.value = "";
+  };
+
+  const handleGallerySelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        let fileType: "image" | "video" | "file" = "file";
+        let content = "";
+
+        if (file.type.startsWith("image/")) {
+          fileType = "image";
+          content = "📷 Photo shared";
+        } else if (file.type.startsWith("video/")) {
+          fileType = "video";
+          content = "🎥 Video shared";
+        } else {
+          content = "📎 File shared";
+        }
+
+        const fileMessage: Message = {
+          id: Date.now().toString(),
+          content,
+          sender: "me",
+          timestamp: new Date(),
+          type: fileType,
+          fileUrl: e.target?.result as string,
+          fileName: file.name,
+          fileSize: file.size,
+        };
+        setMessages((prev) => [...prev, fileMessage]);
+      };
+      reader.readAsDataURL(file);
+    }
+    event.target.value = "";
+  };
+
+  const handleAudioSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const audioMessage: Message = {
+          id: Date.now().toString(),
+          content: "🎵 Audio message",
+          sender: "me",
+          timestamp: new Date(),
+          type: "audio",
+          fileUrl: e.target?.result as string,
+          fileName: file.name,
+          fileSize: file.size,
+        };
+        setMessages((prev) => [...prev, audioMessage]);
+      };
+      reader.readAsDataURL(file);
+    }
+    event.target.value = "";
   };
 
   const formatTime = (date: Date) => {
@@ -334,7 +449,66 @@ export default function StrangerChat() {
                                 : "bg-muted"
                             }`}
                           >
-                            <p>{message.content}</p>
+                            <div className="text-sm">
+                              {message.type === "image" && message.fileUrl ? (
+                                <div className="space-y-2">
+                                  <img
+                                    src={message.fileUrl}
+                                    alt={message.fileName || "Image"}
+                                    className="max-w-full h-auto max-h-64 rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                                    onClick={() =>
+                                      window.open(message.fileUrl, "_blank")
+                                    }
+                                  />
+                                  <div className="text-xs opacity-75">
+                                    <p>{message.content}</p>
+                                    {message.fileName && (
+                                      <p className="truncate">
+                                        {message.fileName}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              ) : message.type === "video" &&
+                                message.fileUrl ? (
+                                <div className="space-y-2">
+                                  <video
+                                    src={message.fileUrl}
+                                    controls
+                                    className="max-w-full h-auto max-h-64 rounded-lg"
+                                    preload="metadata"
+                                  />
+                                  <div className="text-xs opacity-75">
+                                    <p>{message.content}</p>
+                                    {message.fileName && (
+                                      <p className="truncate">
+                                        {message.fileName}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              ) : message.type === "audio" &&
+                                message.fileUrl ? (
+                                <div className="space-y-2">
+                                  <audio
+                                    src={message.fileUrl}
+                                    controls
+                                    className="w-full max-w-xs"
+                                    preload="metadata"
+                                  />
+                                  <div className="text-xs opacity-75">
+                                    <p>{message.content}</p>
+                                    {message.fileName && (
+                                      <p className="truncate">
+                                        {message.fileName}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              ) : (
+                                <p>{message.content}</p>
+                              )}
+                            </div>
                             <p className="text-xs opacity-70 mt-1">
                               {formatTime(message.timestamp)}
                             </p>
@@ -413,49 +587,19 @@ export default function StrangerChat() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="start">
                         <DropdownMenuItem
-                          onClick={() => {
-                            const userType = localStorage.getItem("userType");
-                            if (userType === "guest") {
-                              toast({
-                                title: "Feature Restricted",
-                                description:
-                                  "Please create an account to send files.",
-                                variant: "destructive",
-                              });
-                            }
-                          }}
+                          onClick={() => handleFileUpload("camera")}
                         >
                           <Camera className="h-4 w-4 mr-2" />
                           Camera
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => {
-                            const userType = localStorage.getItem("userType");
-                            if (userType === "guest") {
-                              toast({
-                                title: "Feature Restricted",
-                                description:
-                                  "Please create an account to send files.",
-                                variant: "destructive",
-                              });
-                            }
-                          }}
+                          onClick={() => handleFileUpload("gallery")}
                         >
                           <Image className="h-4 w-4 mr-2" />
                           Photo & Video
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => {
-                            const userType = localStorage.getItem("userType");
-                            if (userType === "guest") {
-                              toast({
-                                title: "Feature Restricted",
-                                description:
-                                  "Please create an account to send files.",
-                                variant: "destructive",
-                              });
-                            }
-                          }}
+                          onClick={() => handleFileUpload("audio")}
                         >
                           <Mic className="h-4 w-4 mr-2" />
                           Audio
@@ -622,6 +766,32 @@ export default function StrangerChat() {
           </Card>
         </div>
       </div>
+
+      {/* Hidden file inputs */}
+      <input
+        ref={cameraInputRef}
+        type="file"
+        className="hidden"
+        accept="image/*,video/*"
+        capture="environment"
+        onChange={handleCameraCapture}
+      />
+
+      <input
+        ref={galleryInputRef}
+        type="file"
+        className="hidden"
+        accept="image/*,video/*,.pdf,.doc,.docx,.txt,.mp4,.avi,.mov"
+        onChange={handleGallerySelect}
+      />
+
+      <input
+        ref={audioInputRef}
+        type="file"
+        className="hidden"
+        accept="audio/*,.mp3,.wav,.aac,.ogg,.flac,.m4a"
+        onChange={handleAudioSelect}
+      />
     </div>
   );
 }

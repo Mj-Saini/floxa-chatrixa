@@ -46,6 +46,11 @@ export default function VideoCall() {
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const durationIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Initialize media when component mounts
+  useEffect(() => {
+    initializeMedia();
+  }, []);
+
   // Initialize Socket.io connection
   useEffect(() => {
     // In production, this would be your actual socket server
