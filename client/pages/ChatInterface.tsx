@@ -520,7 +520,12 @@ export default function ChatInterface() {
                           className="max-w-full h-auto max-h-64 rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
                           onClick={() => window.open(message.fileUrl, "_blank")}
                         />
-                        <p className="text-xs opacity-75">{message.content}</p>
+                        <div className="text-xs opacity-75">
+                          <p>{message.content}</p>
+                          {message.fileName && (
+                            <p className="truncate">{message.fileName}</p>
+                          )}
+                        </div>
                       </div>
                     ) : message.type === "video" && message.fileUrl ? (
                       <div className="space-y-2">
