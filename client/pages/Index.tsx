@@ -31,7 +31,7 @@ export default function Index() {
       title: "Talk to Stranger",
       description: "Start anonymous conversations with people worldwide",
       color: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-      href: "/stranger-chat",
+      href: "/home/stranger-chat",
       gradient: "from-blue-400 to-cyan-400",
     },
     {
@@ -39,7 +39,7 @@ export default function Index() {
       title: "Video Call",
       description: "Face-to-face conversations with random strangers",
       color: "bg-green-500/10 text-green-400 border-green-500/20",
-      href: "/video-call",
+      href: "/home/video-call",
       gradient: "from-green-400 to-emerald-400",
     },
     {
@@ -118,7 +118,7 @@ export default function Index() {
 
           {/* Quick Actions */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-lg mx-auto">
-            <Link to="/stranger-chat" className="flex-1">
+            <Link to="/home/stranger-chat" className="flex-1">
               <Button
                 size="lg"
                 className="w-full bg-gradient-to-r from-primary to-brand-purple hover:opacity-90 transform hover:scale-105 transition-all duration-200"
@@ -127,7 +127,7 @@ export default function Index() {
                 Talk to Stranger
               </Button>
             </Link>
-            <Link to="/video-call" className="flex-1">
+            <Link to="/home/video-call" className="flex-1">
               <Button
                 size="lg"
                 variant="outline"
@@ -220,57 +220,59 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Additional Features */}
-      <section className="py-20 px-4 bg-muted/20">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <h2 className="text-3xl md:text-4xl font-bold">
-                Earn While You Chat
-              </h2>
-              <p className="text-lg text-muted-foreground">
-                Our unique reward system lets you earn points for every
-                conversation, referral, and daily login. Convert your points to
-                real money!
-              </p>
+      {/* Additional Features - Only for registered users */}
+      {localStorage.getItem("userType") !== "guest" && (
+        <section className="py-20 px-4 bg-muted/20">
+          <div className="container mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+              <div className="space-y-6">
+                <h2 className="text-3xl md:text-4xl font-bold">
+                  Earn While You Chat
+                </h2>
+                <p className="text-lg text-muted-foreground">
+                  Our unique reward system lets you earn points for every
+                  conversation, referral, and daily login. Convert your points
+                  to real money!
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <Link to="/home/wallet">
+                    <Button className="w-full" variant="outline">
+                      <Wallet className="mr-2 h-4 w-4" />
+                      View Wallet
+                    </Button>
+                  </Link>
+                  <Link to="/home/refer">
+                    <Button className="w-full" variant="outline">
+                      <Gift className="mr-2 h-4 w-4" />
+                      Refer Friends
+                    </Button>
+                  </Link>
+                </div>
+              </div>
               <div className="grid grid-cols-2 gap-4">
-                <Link to="/wallet">
-                  <Button className="w-full" variant="outline">
-                    <Wallet className="mr-2 h-4 w-4" />
-                    View Wallet
-                  </Button>
-                </Link>
-                <Link to="/refer">
-                  <Button className="w-full" variant="outline">
-                    <Gift className="mr-2 h-4 w-4" />
-                    Refer Friends
-                  </Button>
-                </Link>
+                <Card className="bg-gradient-to-br from-primary/10 to-brand-purple/10 border-primary/20">
+                  <CardContent className="p-6 text-center">
+                    <Wallet className="h-12 w-12 mx-auto mb-4 text-primary" />
+                    <div className="text-2xl font-bold">1,000+</div>
+                    <div className="text-sm text-muted-foreground">
+                      Points Per Referral
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-gradient-to-br from-brand-pink/10 to-brand-blue/10 border-brand-pink/20">
+                  <CardContent className="p-6 text-center">
+                    <Gift className="h-12 w-12 mx-auto mb-4 text-brand-pink" />
+                    <div className="text-2xl font-bold">₹10</div>
+                    <div className="text-sm text-muted-foreground">
+                      Per 1000 Points
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <Card className="bg-gradient-to-br from-primary/10 to-brand-purple/10 border-primary/20">
-                <CardContent className="p-6 text-center">
-                  <Wallet className="h-12 w-12 mx-auto mb-4 text-primary" />
-                  <div className="text-2xl font-bold">1,000+</div>
-                  <div className="text-sm text-muted-foreground">
-                    Points Per Referral
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="bg-gradient-to-br from-brand-pink/10 to-brand-blue/10 border-brand-pink/20">
-                <CardContent className="p-6 text-center">
-                  <Gift className="h-12 w-12 mx-auto mb-4 text-brand-pink" />
-                  <div className="text-2xl font-bold">₹10</div>
-                  <div className="text-sm text-muted-foreground">
-                    Per 1000 Points
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   );
 }

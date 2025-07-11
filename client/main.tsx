@@ -55,7 +55,14 @@ const App = () => (
               </ProtectedRoute>
             }
           >
-            <Route index element={<Index />} />
+            <Route
+              index
+              element={
+                <ProtectedRoute guestAllowed={true}>
+                  <Index />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Chat Pages - Guests allowed */}
             <Route
