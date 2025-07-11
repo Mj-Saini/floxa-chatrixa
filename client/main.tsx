@@ -50,7 +50,7 @@ const App = () => (
           <Route
             path="/home"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute guestAllowed={true}>
                 <Layout />
               </ProtectedRoute>
             }
