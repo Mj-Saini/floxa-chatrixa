@@ -92,6 +92,8 @@ export default function StrangerChat() {
         country: randomCountry,
         gender: randomGender,
         isTyping: false,
+        name: "Stranger",
+        avatar: "",
       });
       setMessages([
         {

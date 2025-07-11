@@ -36,7 +36,7 @@ export default function BottomNavigation() {
                     )}
                   />
                   {item.badge && (
-                    <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 text-xs bg-destructive hover:bg-destructive">
+                    <Badge className="absolute -top-2 flex items-center justify-center -right-2 h-5 w-5 p-0 text-xs bg-destructive hover:bg-destructive">
                       {item.badge}
                     </Badge>
                   )}
