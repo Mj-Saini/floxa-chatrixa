@@ -362,7 +362,7 @@ export default function StrangerChat() {
           </Card>
 
           {/* Chat Area */}
-          <Card className="flex-1 bg-card/50 backdrop-blur-sm border-border/50 flex flex-col">
+          <Card className="flex-1 bg-card/50 backdrop-blur-sm border-border/50 flex flex-col h-[calc(100vh-12rem)]">
             {!isConnected && !isConnecting ? (
               /* Connection Screen */
               <CardContent className="flex-1 flex items-center justify-center">
@@ -550,8 +550,8 @@ export default function StrangerChat() {
                   <div ref={messagesEndRef} />
                 </CardContent>
 
-                {/* Chat Input - Sticky at bottom */}
-                <div className="border-t border-border/30 p-4 bg-background sticky bottom-0">
+                {/* Chat Input - Fixed at bottom */}
+                <div className="border-t border-border/30 p-4 bg-background">
                   <div className="flex items-center space-x-2 mb-3">
                     <Button
                       onClick={handleSkip}
