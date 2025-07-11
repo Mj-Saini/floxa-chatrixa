@@ -208,7 +208,7 @@ export default function Chats() {
       ),
     );
 
-    window.location.href = `/chat/${chatId}`;
+    window.location.href = `/home/chat/${chatId}`;
   };
 
   return (

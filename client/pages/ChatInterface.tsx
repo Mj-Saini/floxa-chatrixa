@@ -23,15 +23,19 @@ import {
   CheckCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Message {
   id: string;
   content: string;
   sender: "me" | "other";
   timestamp: Date;
-  type: "text" | "image" | "file" | "audio";
+  type: "text" | "image" | "file" | "audio" | "video";
   isEdited?: boolean;
   replyTo?: string;
+  fileUrl?: string;
+  fileName?: string;
+  fileSize?: number;
 }
 
 interface ChatUser {
@@ -47,6 +51,7 @@ interface ChatUser {
 export default function ChatInterface() {
   const { chatId } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -111,7 +116,7 @@ export default function ChatInterface() {
     "😤",
     "😠",
     "😡",
-    "🤬",
+    "��",
     "🤯",
     "😳",
     "🥵",
@@ -328,6 +333,19 @@ export default function ChatInterface() {
   };
 
   const handleFileUpload = (type: string) => {
+    const userType = localStorage.getItem("userType");
+
+    if (userType === "guest") {
+      // Show toast for guest users
+      toast({
+        title: "Feature Restricted",
+        description:
+          "Please create an account to send files, images, and videos.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (type === "camera") {
       cameraInputRef.current?.click();
     } else if (type === "gallery") {
@@ -345,51 +363,91 @@ export default function ChatInterface() {
   const handleCameraCapture = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const imageMessage: Message = {
-        id: Date.now().toString(),
-        content: `📷 Photo captured: ${file.name}`,
-        sender: "me",
-        timestamp: new Date(),
-        type: "image",
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        let fileType: "image" | "video" = "image";
+        let content = "📷 Photo captured";
+
+        if (file.type.startsWith("video/")) {
+          fileType = "video";
+          content = "🎥 Video captured";
+        }
+
+        const mediaMessage: Message = {
+          id: Date.now().toString(),
+          content,
+          sender: "me",
+          timestamp: new Date(),
+          type: fileType,
+          fileUrl: e.target?.result as string,
+          fileName: file.name,
+          fileSize: file.size,
+        };
+        setMessages((prev) => [...prev, mediaMessage]);
       };
-      setMessages((prev) => [...prev, imageMessage]);
+      reader.readAsDataURL(file);
     }
+    // Clear input for next selection
+    event.target.value = "";
   };
 
   const handleGallerySelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const fileType = file.type.startsWith("image/")
-        ? "image"
-        : file.type.startsWith("video/")
-          ? "image"
-          : "file";
-      const fileMessage: Message = {
-        id: Date.now().toString(),
-        content: `📎 ${fileType === "image" ? "Photo/Video" : "File"} shared: ${file.name}`,
-        sender: "me",
-        timestamp: new Date(),
-        type: fileType as "image" | "file",
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        let fileType: "image" | "video" | "file" = "file";
+        let content = "";
+
+        if (file.type.startsWith("image/")) {
+          fileType = "image";
+          content = "📷 Photo shared";
+        } else if (file.type.startsWith("video/")) {
+          fileType = "video";
+          content = "🎥 Video shared";
+        } else {
+          content = "📎 File shared";
+        }
+
+        const fileMessage: Message = {
+          id: Date.now().toString(),
+          content,
+          sender: "me",
+          timestamp: new Date(),
+          type: fileType,
+          fileUrl: e.target?.result as string,
+          fileName: file.name,
+          fileSize: file.size,
+        };
+        setMessages((prev) => [...prev, fileMessage]);
       };
-      setMessages((prev) => [...prev, fileMessage]);
+      reader.readAsDataURL(file);
     }
+    // Clear input for next selection
+    event.target.value = "";
   };
 
   const handleAudioSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const audioMessage: Message = {
-        id: Date.now().toString(),
-        content: `🎵 ${file.name}`,
-        sender: "me",
-        timestamp: new Date(),
-        type: "audio",
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const audioMessage: Message = {
+          id: Date.now().toString(),
+          content: "🎵 Audio message",
+          sender: "me",
+          timestamp: new Date(),
+          type: "audio",
+          fileUrl: e.target?.result as string,
+          fileName: file.name,
+          fileSize: file.size,
+        };
+        setMessages((prev) => [...prev, audioMessage]);
       };
-      setMessages((prev) => [...prev, audioMessage]);
-
-      // Clear the input for next selection
-      event.target.value = "";
+      reader.readAsDataURL(file);
     }
+    // Clear the input for next selection
+    event.target.value = "";
   };
 
   const formatTime = (date: Date) => {
@@ -408,8 +466,11 @@ export default function ChatInterface() {
       {/* Chat Header */}
       <ChatHeader user={chatUser} isTyping={isTyping} />
 
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
+      {/* Messages Area - Fixed height with scroll */}
+      <div
+        className="flex-1 overflow-y-auto p-4 space-y-4"
+        style={{ height: "calc(100vh - 140px)" }}
+      >
         {messages.map((message) => (
           <div
             key={message.id}
@@ -453,7 +514,104 @@ export default function ChatInterface() {
                     )
                   }
                 >
-                  <p className="text-sm">{message.content}</p>
+                  <div className="text-sm">
+                    {message.type === "image" && message.fileUrl ? (
+                      <div className="space-y-2">
+                        <img
+                          src={message.fileUrl}
+                          alt={message.fileName || "Image"}
+                          className="max-w-full h-auto max-h-64 rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                          onClick={() => window.open(message.fileUrl, "_blank")}
+                        />
+                        <div className="text-xs opacity-75">
+                          <p>{message.content}</p>
+                          {message.fileName && (
+                            <p className="truncate">{message.fileName}</p>
+                          )}
+                        </div>
+                      </div>
+                    ) : message.type === "video" && message.fileUrl ? (
+                      <div className="space-y-2">
+                        <video
+                          src={message.fileUrl}
+                          controls
+                          className="max-w-full h-auto max-h-64 rounded-lg"
+                          preload="metadata"
+                        />
+                        <div className="text-xs opacity-75">
+                          <p>{message.content}</p>
+                          {message.fileName && (
+                            <p className="truncate">{message.fileName}</p>
+                          )}
+                        </div>
+                      </div>
+                    ) : message.type === "audio" && message.fileUrl ? (
+                      <div className="space-y-2">
+                        <audio
+                          src={message.fileUrl}
+                          controls
+                          className="w-full max-w-xs"
+                          preload="metadata"
+                        />
+                        <div className="text-xs opacity-75">
+                          <p>{message.content}</p>
+                          {message.fileName && (
+                            <p className="truncate">{message.fileName}</p>
+                          )}
+                        </div>
+                      </div>
+                    ) : message.type === "file" && message.fileUrl ? (
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-3 p-3 bg-muted/20 rounded-lg border border-border/30">
+                          <div className="p-2 bg-primary/10 rounded-lg">
+                            <svg
+                              className="h-6 w-6 text-primary"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                              />
+                            </svg>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">
+                              {message.fileName || "Document"}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {message.content}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() =>
+                              window.open(message.fileUrl, "_blank")
+                            }
+                            className="p-1 text-primary hover:bg-primary/10 rounded"
+                          >
+                            <svg
+                              className="h-4 w-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <p>{message.content}</p>
+                    )}
+                  </div>
                   <div className="flex items-center justify-between mt-1">
                     <span className="text-xs opacity-70">
                       {formatTime(message.timestamp)}
@@ -540,8 +698,8 @@ export default function ChatInterface() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Message Input */}
-      <div className="p-4 border-t border-border/50 bg-background sticky bottom-0">
+      {/* Message Input - Sticky at bottom */}
+      <div className="p-4 border-t border-border/50 bg-background">
         <div className="flex items-center space-x-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -622,7 +780,7 @@ export default function ChatInterface() {
         ref={cameraInputRef}
         type="file"
         className="hidden"
-        accept="image/*"
+        accept="image/*,video/*"
         capture="environment"
         onChange={handleCameraCapture}
       />
@@ -631,7 +789,7 @@ export default function ChatInterface() {
         ref={galleryInputRef}
         type="file"
         className="hidden"
-        accept="image/*,video/*,.pdf,.doc,.docx"
+        accept="image/*,video/*,.pdf,.doc,.docx,.txt,.mp4,.avi,.mov"
         onChange={handleGallerySelect}
       />
 

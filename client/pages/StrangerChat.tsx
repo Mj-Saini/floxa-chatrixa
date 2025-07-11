@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import PageHeader from "@/components/PageHeader";
+
 import {
   MessageCircle,
   Send,
@@ -26,13 +26,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Message {
   id: string;
   content: string;
   sender: "me" | "stranger";
   timestamp: Date;
-  type: "text" | "system";
+  type: "text" | "system" | "image" | "video" | "audio" | "file";
+  fileUrl?: string;
+  fileName?: string;
+  fileSize?: number;
 }
 
 interface StrangerInfo {
@@ -44,6 +48,7 @@ interface StrangerInfo {
 }
 
 export default function StrangerChat() {
+  const { toast } = useToast();
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -56,6 +61,9 @@ export default function StrangerChat() {
     avatar: "",
   });
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+  const audioInputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -178,6 +186,115 @@ export default function StrangerChat() {
     }, 1000);
   };
 
+  const handleFileUpload = (type: string) => {
+    const userType = localStorage.getItem("userType");
+
+    if (userType === "guest") {
+      toast({
+        title: "Feature Restricted",
+        description:
+          "Please create an account to send files, images, and videos.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (type === "camera") {
+      cameraInputRef.current?.click();
+    } else if (type === "gallery") {
+      galleryInputRef.current?.click();
+    } else if (type === "audio") {
+      audioInputRef.current?.click();
+    }
+  };
+
+  const handleCameraCapture = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        let fileType: "image" | "video" = "image";
+        let content = "📷 Photo captured";
+
+        if (file.type.startsWith("video/")) {
+          fileType = "video";
+          content = "🎥 Video captured";
+        }
+
+        const mediaMessage: Message = {
+          id: Date.now().toString(),
+          content,
+          sender: "me",
+          timestamp: new Date(),
+          type: fileType,
+          fileUrl: e.target?.result as string,
+          fileName: file.name,
+          fileSize: file.size,
+        };
+        setMessages((prev) => [...prev, mediaMessage]);
+      };
+      reader.readAsDataURL(file);
+    }
+    event.target.value = "";
+  };
+
+  const handleGallerySelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        let fileType: "image" | "video" | "file" = "file";
+        let content = "";
+
+        if (file.type.startsWith("image/")) {
+          fileType = "image";
+          content = "📷 Photo shared";
+        } else if (file.type.startsWith("video/")) {
+          fileType = "video";
+          content = "🎥 Video shared";
+        } else {
+          content = "📎 File shared";
+        }
+
+        const fileMessage: Message = {
+          id: Date.now().toString(),
+          content,
+          sender: "me",
+          timestamp: new Date(),
+          type: fileType,
+          fileUrl: e.target?.result as string,
+          fileName: file.name,
+          fileSize: file.size,
+        };
+        setMessages((prev) => [...prev, fileMessage]);
+      };
+      reader.readAsDataURL(file);
+    }
+    event.target.value = "";
+  };
+
+  const handleAudioSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const audioMessage: Message = {
+          id: Date.now().toString(),
+          content: "🎵 Audio message",
+          sender: "me",
+          timestamp: new Date(),
+          type: "audio",
+          fileUrl: e.target?.result as string,
+          fileName: file.name,
+          fileSize: file.size,
+        };
+        setMessages((prev) => [...prev, audioMessage]);
+      };
+      reader.readAsDataURL(file);
+    }
+    event.target.value = "";
+  };
+
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString("en-US", {
       hour: "2-digit",
@@ -186,13 +303,9 @@ export default function StrangerChat() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <PageHeader
-        title="Talk to Stranger"
-        subtitle="Connect with people worldwide through anonymous text chat"
-      />
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="flex flex-col h-[calc(100vh-16rem)]">
+    <div className="h-screen bg-background flex flex-col">
+      <div className="flex-1 container mx-auto px-4 py-4 max-w-4xl flex flex-col h-[calc(100vh-4rem)]">
+        <div className="flex flex-col h-full">
           {/* Header */}
           <Card className="bg-card/50 backdrop-blur-sm border-border/50 mb-4">
             <CardHeader className="pb-3">
@@ -247,7 +360,7 @@ export default function StrangerChat() {
           </Card>
 
           {/* Chat Area */}
-          <Card className="flex-1 bg-card/50 backdrop-blur-sm border-border/50 flex flex-col">
+          <Card className="flex-1 bg-card/50 backdrop-blur-sm border-border/50 flex flex-col overflow-hidden">
             {!isConnected && !isConnecting ? (
               /* Connection Screen */
               <CardContent className="flex-1 flex items-center justify-center">
@@ -308,7 +421,7 @@ export default function StrangerChat() {
               /* Chat Interface */
               <>
                 {/* Messages */}
-                <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
+                <CardContent className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
                   {messages.map((message) => (
                     <div
                       key={message.id}
@@ -334,7 +447,66 @@ export default function StrangerChat() {
                                 : "bg-muted"
                             }`}
                           >
-                            <p>{message.content}</p>
+                            <div className="text-sm">
+                              {message.type === "image" && message.fileUrl ? (
+                                <div className="space-y-2">
+                                  <img
+                                    src={message.fileUrl}
+                                    alt={message.fileName || "Image"}
+                                    className="max-w-full h-auto max-h-64 rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                                    onClick={() =>
+                                      window.open(message.fileUrl, "_blank")
+                                    }
+                                  />
+                                  <div className="text-xs opacity-75">
+                                    <p>{message.content}</p>
+                                    {message.fileName && (
+                                      <p className="truncate">
+                                        {message.fileName}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              ) : message.type === "video" &&
+                                message.fileUrl ? (
+                                <div className="space-y-2">
+                                  <video
+                                    src={message.fileUrl}
+                                    controls
+                                    className="max-w-full h-auto max-h-64 rounded-lg"
+                                    preload="metadata"
+                                  />
+                                  <div className="text-xs opacity-75">
+                                    <p>{message.content}</p>
+                                    {message.fileName && (
+                                      <p className="truncate">
+                                        {message.fileName}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              ) : message.type === "audio" &&
+                                message.fileUrl ? (
+                                <div className="space-y-2">
+                                  <audio
+                                    src={message.fileUrl}
+                                    controls
+                                    className="w-full max-w-xs"
+                                    preload="metadata"
+                                  />
+                                  <div className="text-xs opacity-75">
+                                    <p>{message.content}</p>
+                                    {message.fileName && (
+                                      <p className="truncate">
+                                        {message.fileName}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              ) : (
+                                <p>{message.content}</p>
+                              )}
+                            </div>
                             <p className="text-xs opacity-70 mt-1">
                               {formatTime(message.timestamp)}
                             </p>
@@ -373,8 +545,8 @@ export default function StrangerChat() {
                   <div ref={messagesEndRef} />
                 </CardContent>
 
-                {/* Chat Input */}
-                <div className="border-t border-border/30 p-4">
+                {/* Chat Input - Fixed at bottom */}
+                <div className="border-t border-border/30 p-4 bg-background">
                   <div className="flex items-center space-x-2 mb-3">
                     <Button
                       onClick={handleSkip}
@@ -412,15 +584,21 @@ export default function StrangerChat() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="start">
-                        <DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleFileUpload("camera")}
+                        >
                           <Camera className="h-4 w-4 mr-2" />
                           Camera
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleFileUpload("gallery")}
+                        >
                           <Image className="h-4 w-4 mr-2" />
                           Photo & Video
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleFileUpload("audio")}
+                        >
                           <Mic className="h-4 w-4 mr-2" />
                           Audio
                         </DropdownMenuItem>
@@ -470,7 +648,7 @@ export default function StrangerChat() {
                             "😎",
                             "🤩",
                             "🥳",
-                            "����",
+                            "😏",
                             "😒",
                             "😞",
                             "😔",
@@ -586,6 +764,32 @@ export default function StrangerChat() {
           </Card>
         </div>
       </div>
+
+      {/* Hidden file inputs */}
+      <input
+        ref={cameraInputRef}
+        type="file"
+        className="hidden"
+        accept="image/*,video/*"
+        capture="environment"
+        onChange={handleCameraCapture}
+      />
+
+      <input
+        ref={galleryInputRef}
+        type="file"
+        className="hidden"
+        accept="image/*,video/*,.pdf,.doc,.docx,.txt,.mp4,.avi,.mov"
+        onChange={handleGallerySelect}
+      />
+
+      <input
+        ref={audioInputRef}
+        type="file"
+        className="hidden"
+        accept="audio/*,.mp3,.wav,.aac,.ogg,.flac,.m4a"
+        onChange={handleAudioSelect}
+      />
     </div>
   );
 }

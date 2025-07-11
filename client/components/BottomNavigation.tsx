@@ -6,13 +6,35 @@ import { Badge } from "@/components/ui/badge";
 
 export default function BottomNavigation() {
   const location = useLocation();
+  const userType = localStorage.getItem("userType");
 
-  const navItems = [
-    { href: "/", label: "Home", icon: MessageCircle },
-    { href: "/stranger-chat", label: "Chat", icon: MessageCircle },
-    { href: "/video-call", label: "Video", icon: Video },
-    { href: "/chats", label: "Messages", icon: Users, badge: 3 },
+  const allNavItems = [
+    { href: "/home", label: "Home", icon: MessageCircle },
+    {
+      href: "/home/stranger-chat",
+      label: "Chat",
+      icon: MessageCircle,
+      guestAllowed: true,
+    },
+    {
+      href: "/home/video-call",
+      label: "Video",
+      icon: Video,
+      guestAllowed: true,
+    },
+    {
+      href: "/home/chats",
+      label: "Messages",
+      icon: Users,
+      badge: 3,
+      guestAllowed: false,
+    },
   ];
+
+  const navItems =
+    userType === "guest"
+      ? allNavItems.filter((item) => item.guestAllowed)
+      : allNavItems;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-t border-border/50">
@@ -21,7 +43,7 @@ export default function BottomNavigation() {
           const Icon = item.icon;
           const isActive =
             location.pathname === item.href ||
-            (item.href === "/" && location.pathname === "/");
+            (item.href === "/home" && location.pathname === "/home");
 
           return (
             <Link key={item.href} to={item.href}>

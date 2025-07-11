@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,8 +15,58 @@ import { Separator } from "@/components/ui/separator";
 import { MessageCircle, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Form states
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [username, setUsername] = useState("");
+
+  const handleLogin = () => {
+    if (!email || !password) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    // Save authenticated user data
+    localStorage.setItem("userType", "registered");
+    localStorage.setItem("username", email.split("@")[0]);
+    localStorage.setItem("isAuthenticated", "true");
+
+    // Check if user has already completed onboarding
+    const existingGender = localStorage.getItem("userGender");
+    const existingCountry = localStorage.getItem("userCountry");
+
+    if (existingGender && existingCountry) {
+      // Returning user, go directly to home
+      navigate("/home");
+    } else {
+      // New user, go to gender selection
+      navigate("/gender-selection");
+    }
+  };
+
+  const handleSignup = () => {
+    if (!email || !password || !confirmPassword || !username) {
+      alert("Please fill in all fields");
+      return;
+    }
+    if (password !== confirmPassword) {
+      alert("Passwords don't match");
+      return;
+    }
+
+    // Save new user data
+    localStorage.setItem("userType", "registered");
+    localStorage.setItem("username", username);
+    localStorage.setItem("isAuthenticated", "true");
+
+    // New signup users always go to gender selection (first time)
+    navigate("/gender-selection");
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-brand-purple/5 flex items-center justify-center p-4">
@@ -70,6 +120,8 @@ export default function Login() {
                         id="email"
                         type="text"
                         placeholder="Enter your email or username"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         className="pl-10 bg-background/50 border-border/50 focus:border-primary"
                       />
                     </div>
@@ -83,6 +135,8 @@ export default function Login() {
                         id="password"
                         type={showPassword ? "text" : "password"}
                         placeholder="Enter your password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         className="pl-10 pr-10 bg-background/50 border-border/50 focus:border-primary"
                       />
                       <button
@@ -109,6 +163,8 @@ export default function Login() {
                   </div>
 
                   <Button
+                    type="button"
+                    onClick={handleLogin}
                     className="w-full bg-primary hover:bg-primary/90"
                     size="lg"
                   >
@@ -147,7 +203,12 @@ export default function Login() {
                   Continue with Google
                 </Button>
 
-                <Button variant="outline" className="w-full" size="lg">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  size="lg"
+                  onClick={() => navigate("/guest-setup")}
+                >
                   <User className="mr-2 h-4 w-4" />
                   Continue as Guest
                 </Button>
@@ -163,6 +224,8 @@ export default function Login() {
                         id="signup-email"
                         type="email"
                         placeholder="Enter your email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         className="pl-10 bg-background/50 border-border/50 focus:border-primary"
                       />
                     </div>
@@ -176,6 +239,8 @@ export default function Login() {
                         id="signup-username"
                         type="text"
                         placeholder="Choose a username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                         className="pl-10 bg-background/50 border-border/50 focus:border-primary"
                       />
                     </div>
@@ -189,6 +254,8 @@ export default function Login() {
                         id="signup-password"
                         type={showPassword ? "text" : "password"}
                         placeholder="Create a password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         className="pl-10 pr-10 bg-background/50 border-border/50 focus:border-primary"
                       />
                       <button
@@ -213,6 +280,8 @@ export default function Login() {
                         id="confirm-password"
                         type={showConfirmPassword ? "text" : "password"}
                         placeholder="Confirm your password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
                         className="pl-10 pr-10 bg-background/50 border-border/50 focus:border-primary"
                       />
                       <button
@@ -232,6 +301,8 @@ export default function Login() {
                   </div>
 
                   <Button
+                    type="button"
+                    onClick={handleSignup}
                     className="w-full bg-primary hover:bg-primary/90"
                     size="lg"
                   >

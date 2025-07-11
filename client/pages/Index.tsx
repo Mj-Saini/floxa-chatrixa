@@ -31,7 +31,7 @@ export default function Index() {
       title: "Talk to Stranger",
       description: "Start anonymous conversations with people worldwide",
       color: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-      href: "/stranger-chat",
+      href: "/home/stranger-chat",
       gradient: "from-blue-400 to-cyan-400",
     },
     {
@@ -39,7 +39,7 @@ export default function Index() {
       title: "Video Call",
       description: "Face-to-face conversations with random strangers",
       color: "bg-green-500/10 text-green-400 border-green-500/20",
-      href: "/video-call",
+      href: "/home/video-call",
       gradient: "from-green-400 to-emerald-400",
     },
     {
@@ -47,7 +47,7 @@ export default function Index() {
       title: "Live Public Rooms",
       description: "Join active group conversations on various topics",
       color: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-      href: "/live-rooms",
+      href: "/home/live-rooms",
       gradient: "from-purple-400 to-pink-400",
     },
     {
@@ -55,7 +55,7 @@ export default function Index() {
       title: "Create Private Room",
       description: "Set up exclusive rooms for your circle",
       color: "bg-orange-500/10 text-orange-400 border-orange-500/20",
-      href: "/private-rooms",
+      href: "/home/private-rooms",
       gradient: "from-orange-400 to-red-400",
     },
     {
@@ -63,7 +63,7 @@ export default function Index() {
       title: "Group Chat",
       description: "Manage group conversations like WhatsApp",
       color: "bg-pink-500/10 text-pink-400 border-pink-500/20",
-      href: "/group-chat",
+      href: "/home/groups",
       gradient: "from-pink-400 to-rose-400",
     },
     {
@@ -71,7 +71,7 @@ export default function Index() {
       title: "Leaderboard",
       description: "See top users and earn your place",
       color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
-      href: "/leaderboard",
+      href: "/home/leaderboard",
       gradient: "from-yellow-400 to-amber-400",
     },
   ];
@@ -107,11 +107,18 @@ export default function Index() {
               share moments, and discover new perspectives from across the
               globe.
             </p>
+            {localStorage.getItem("userType") === "guest" && (
+              <div className="mt-6 inline-flex items-center px-4 py-2 bg-orange-500/10 border border-orange-500/20 rounded-full">
+                <span className="text-orange-400 text-sm font-medium">
+                  👋 Guest Mode - Text & Video Chat Available
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Quick Actions */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-lg mx-auto">
-            <Link to="/stranger-chat" className="flex-1">
+            <Link to="/home/stranger-chat" className="flex-1">
               <Button
                 size="lg"
                 className="w-full bg-gradient-to-r from-primary to-brand-purple hover:opacity-90 transform hover:scale-105 transition-all duration-200"
@@ -120,7 +127,7 @@ export default function Index() {
                 Talk to Stranger
               </Button>
             </Link>
-            <Link to="/video-call" className="flex-1">
+            <Link to="/home/video-call" className="flex-1">
               <Button
                 size="lg"
                 variant="outline"
@@ -171,99 +178,160 @@ export default function Index() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <Link key={index} to={feature.href}>
-                  <Card className="group bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/30 hover:bg-card/70 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-primary/5">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-center space-x-3">
-                        <div
-                          className={`p-3 rounded-xl ${feature.color} group-hover:scale-110 transition-transform duration-300`}
-                        >
-                          <Icon className="h-6 w-6" />
+            {features
+              .filter((feature) => {
+                const userType = localStorage.getItem("userType");
+                if (userType === "guest") {
+                  // Only show stranger chat and video call for guests
+                  return (
+                    feature.href.includes("stranger-chat") ||
+                    feature.href.includes("video-call")
+                  );
+                }
+                return true; // Show all features for registered users
+              })
+              .map((feature, index) => {
+                const Icon = feature.icon;
+                return (
+                  <Link key={index} to={feature.href}>
+                    <Card className="group bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/30 hover:bg-card/70 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-primary/5">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center space-x-3">
+                          <div
+                            className={`p-3 rounded-xl ${feature.color} group-hover:scale-110 transition-transform duration-300`}
+                          >
+                            <Icon className="h-6 w-6" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                              {feature.title}
+                            </CardTitle>
+                          </div>
                         </div>
-                        <div>
-                          <CardTitle className="text-lg group-hover:text-primary transition-colors">
-                            {feature.title}
-                          </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <CardDescription className="text-base">
+                          {feature.description}
+                        </CardDescription>
+                        <div className="mt-4">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="group-hover:bg-primary/10 group-hover:text-primary transition-all"
+                          >
+                            Get Started
+                            <Heart className="ml-2 h-4 w-4 group-hover:text-red-400 transition-colors" />
+                          </Button>
                         </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription className="text-base">
-                        {feature.description}
-                      </CardDescription>
-                      <div className="mt-4">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="group-hover:bg-primary/10 group-hover:text-primary transition-all"
-                        >
-                          Get Started
-                          <Heart className="ml-2 h-4 w-4 group-hover:text-red-400 transition-colors" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              );
-            })}
+                      </CardContent>
+                    </Card>
+                  </Link>
+                );
+              })}
           </div>
         </div>
       </section>
 
-      {/* Additional Features */}
-      <section className="py-20 px-4 bg-muted/20">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <h2 className="text-3xl md:text-4xl font-bold">
-                Earn While You Chat
-              </h2>
-              <p className="text-lg text-muted-foreground">
-                Our unique reward system lets you earn points for every
-                conversation, referral, and daily login. Convert your points to
-                real money!
-              </p>
+      {/* Additional Features - Only for registered users */}
+      {localStorage.getItem("userType") !== "guest" && (
+        <section className="py-20 px-4 bg-muted/20">
+          <div className="container mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+              <div className="space-y-6">
+                <h2 className="text-3xl md:text-4xl font-bold">
+                  Earn While You Chat
+                </h2>
+                <p className="text-lg text-muted-foreground">
+                  Our unique reward system lets you earn points for every
+                  conversation, referral, and daily login. Convert your points
+                  to real money!
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <Link to="/home/wallet">
+                    <Button className="w-full" variant="outline">
+                      <Wallet className="mr-2 h-4 w-4" />
+                      View Wallet
+                    </Button>
+                  </Link>
+                  <Link to="/home/refer">
+                    <Button className="w-full" variant="outline">
+                      <Gift className="mr-2 h-4 w-4" />
+                      Refer Friends
+                    </Button>
+                  </Link>
+                </div>
+              </div>
               <div className="grid grid-cols-2 gap-4">
-                <Link to="/wallet">
-                  <Button className="w-full" variant="outline">
-                    <Wallet className="mr-2 h-4 w-4" />
-                    View Wallet
-                  </Button>
-                </Link>
-                <Link to="/refer">
-                  <Button className="w-full" variant="outline">
-                    <Gift className="mr-2 h-4 w-4" />
-                    Refer Friends
-                  </Button>
-                </Link>
+                <Card className="bg-gradient-to-br from-primary/10 to-brand-purple/10 border-primary/20">
+                  <CardContent className="p-6 text-center">
+                    <Wallet className="h-12 w-12 mx-auto mb-4 text-primary" />
+                    <div className="text-2xl font-bold">1,000+</div>
+                    <div className="text-sm text-muted-foreground">
+                      Points Per Referral
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-gradient-to-br from-brand-pink/10 to-brand-blue/10 border-brand-pink/20">
+                  <CardContent className="p-6 text-center">
+                    <Gift className="h-12 w-12 mx-auto mb-4 text-brand-pink" />
+                    <div className="text-2xl font-bold">₹10</div>
+                    <div className="text-sm text-muted-foreground">
+                      Per 1000 Points
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <Card className="bg-gradient-to-br from-primary/10 to-brand-purple/10 border-primary/20">
-                <CardContent className="p-6 text-center">
-                  <Wallet className="h-12 w-12 mx-auto mb-4 text-primary" />
-                  <div className="text-2xl font-bold">1,000+</div>
-                  <div className="text-sm text-muted-foreground">
-                    Points Per Referral
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="bg-gradient-to-br from-brand-pink/10 to-brand-blue/10 border-brand-pink/20">
-                <CardContent className="p-6 text-center">
-                  <Gift className="h-12 w-12 mx-auto mb-4 text-brand-pink" />
-                  <div className="text-2xl font-bold">₹10</div>
-                  <div className="text-sm text-muted-foreground">
-                    Per 1000 Points
-                  </div>
-                </CardContent>
-              </Card>
+          </div>
+        </section>
+      )}
+
+      {/* Guest Upgrade Section - Only for guest users */}
+      {localStorage.getItem("userType") === "guest" && (
+        <section className="py-20 px-4 bg-gradient-to-r from-orange-500/10 to-amber-500/10">
+          <div className="container mx-auto text-center">
+            <div className="max-w-2xl mx-auto space-y-6">
+              <h2 className="text-3xl md:text-4xl font-bold">
+                Unlock Full Features
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                Create a free account to access groups, personal chats, wallet
+                features, and much more!
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+                <div className="bg-background/50 p-6 rounded-lg border border-border/50">
+                  <Users className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <h3 className="font-semibold mb-2">Personal Chats</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Save conversations and chat with friends
+                  </p>
+                </div>
+                <div className="bg-background/50 p-6 rounded-lg border border-border/50">
+                  <UserPlus className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <h3 className="font-semibold mb-2">Groups & Rooms</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Create and join group conversations
+                  </p>
+                </div>
+                <div className="bg-background/50 p-6 rounded-lg border border-border/50">
+                  <Wallet className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <h3 className="font-semibold mb-2">Earn & Rewards</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Get points and convert to real money
+                  </p>
+                </div>
+              </div>
+              <Button
+                size="lg"
+                className="mt-8"
+                onClick={() => (window.location.href = "/login")}
+              >
+                Create Free Account
+              </Button>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   );
 }
