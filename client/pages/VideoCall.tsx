@@ -46,11 +46,6 @@ export default function VideoCall() {
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const durationIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Initialize media when component mounts
-  useEffect(() => {
-    initializeMedia();
-  }, []);
-
   // Initialize Socket.io connection
   useEffect(() => {
     // In production, this would be your actual socket server
@@ -430,13 +425,27 @@ export default function VideoCall() {
           /* Video Call Interface */
           <>
             {/* Remote Video (Main) */}
-            <video
-              ref={remoteVideoRef}
-              autoPlay
-              playsInline
-              muted={false}
-              className="w-full h-full object-cover"
-            />
+            <div className="relative w-full h-full">
+              <video
+                ref={remoteVideoRef}
+                autoPlay
+                playsInline
+                muted={false}
+                className="w-full h-full object-cover bg-gray-800"
+              />
+
+              {/* Placeholder when no remote video */}
+              {!strangerInfo.isConnected && (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
+                  <div className="text-center text-white">
+                    <div className="w-24 h-24 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Video className="h-12 w-12 text-gray-400" />
+                    </div>
+                    <p>Waiting for stranger...</p>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Local Video (PiP) */}
             <div className="absolute top-4 right-4 w-48 h-36 bg-gray-900 rounded-lg overflow-hidden border-2 border-white/20">
@@ -447,6 +456,9 @@ export default function VideoCall() {
                 muted
                 className="w-full h-full object-cover transform scale-x-[-1]"
               />
+              <div className="absolute bottom-2 left-2 text-xs text-white bg-black/50 px-2 py-1 rounded">
+                You
+              </div>
               {!isVideoOn && (
                 <div className="absolute inset-0 bg-gray-900 flex items-center justify-center">
                   <VideoOff className="h-8 w-8 text-white" />
