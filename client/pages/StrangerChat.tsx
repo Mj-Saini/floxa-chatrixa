@@ -423,7 +423,10 @@ export default function StrangerChat() {
               /* Chat Interface */
               <>
                 {/* Messages */}
-                <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
+                <CardContent
+                  className="flex-1 overflow-y-auto p-4 space-y-4"
+                  style={{ height: "calc(100vh - 300px)" }}
+                >
                   {messages.map((message) => (
                     <div
                       key={message.id}
@@ -547,8 +550,8 @@ export default function StrangerChat() {
                   <div ref={messagesEndRef} />
                 </CardContent>
 
-                {/* Chat Input */}
-                <div className="border-t border-border/30 p-4">
+                {/* Chat Input - Sticky at bottom */}
+                <div className="border-t border-border/30 p-4 bg-background sticky bottom-0">
                   <div className="flex items-center space-x-2 mb-3">
                     <Button
                       onClick={handleSkip}
