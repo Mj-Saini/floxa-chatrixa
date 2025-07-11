@@ -178,44 +178,56 @@ export default function Index() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <Link key={index} to={feature.href}>
-                  <Card className="group bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/30 hover:bg-card/70 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-primary/5">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-center space-x-3">
-                        <div
-                          className={`p-3 rounded-xl ${feature.color} group-hover:scale-110 transition-transform duration-300`}
-                        >
-                          <Icon className="h-6 w-6" />
+            {features
+              .filter((feature) => {
+                const userType = localStorage.getItem("userType");
+                if (userType === "guest") {
+                  // Only show stranger chat and video call for guests
+                  return (
+                    feature.href.includes("stranger-chat") ||
+                    feature.href.includes("video-call")
+                  );
+                }
+                return true; // Show all features for registered users
+              })
+              .map((feature, index) => {
+                const Icon = feature.icon;
+                return (
+                  <Link key={index} to={feature.href}>
+                    <Card className="group bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/30 hover:bg-card/70 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-primary/5">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center space-x-3">
+                          <div
+                            className={`p-3 rounded-xl ${feature.color} group-hover:scale-110 transition-transform duration-300`}
+                          >
+                            <Icon className="h-6 w-6" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                              {feature.title}
+                            </CardTitle>
+                          </div>
                         </div>
-                        <div>
-                          <CardTitle className="text-lg group-hover:text-primary transition-colors">
-                            {feature.title}
-                          </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <CardDescription className="text-base">
+                          {feature.description}
+                        </CardDescription>
+                        <div className="mt-4">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="group-hover:bg-primary/10 group-hover:text-primary transition-all"
+                          >
+                            Get Started
+                            <Heart className="ml-2 h-4 w-4 group-hover:text-red-400 transition-colors" />
+                          </Button>
                         </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription className="text-base">
-                        {feature.description}
-                      </CardDescription>
-                      <div className="mt-4">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="group-hover:bg-primary/10 group-hover:text-primary transition-all"
-                        >
-                          Get Started
-                          <Heart className="ml-2 h-4 w-4 group-hover:text-red-400 transition-colors" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              );
-            })}
+                      </CardContent>
+                    </Card>
+                  </Link>
+                );
+              })}
           </div>
         </div>
       </section>
