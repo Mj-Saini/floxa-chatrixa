@@ -26,6 +26,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Message {
   id: string;
@@ -44,6 +45,7 @@ interface StrangerInfo {
 }
 
 export default function StrangerChat() {
+  const { toast } = useToast();
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -410,15 +412,51 @@ export default function StrangerChat() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="start">
-                        <DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            const userType = localStorage.getItem("userType");
+                            if (userType === "guest") {
+                              toast({
+                                title: "Feature Restricted",
+                                description:
+                                  "Please create an account to send files.",
+                                variant: "destructive",
+                              });
+                            }
+                          }}
+                        >
                           <Camera className="h-4 w-4 mr-2" />
                           Camera
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            const userType = localStorage.getItem("userType");
+                            if (userType === "guest") {
+                              toast({
+                                title: "Feature Restricted",
+                                description:
+                                  "Please create an account to send files.",
+                                variant: "destructive",
+                              });
+                            }
+                          }}
+                        >
                           <Image className="h-4 w-4 mr-2" />
                           Photo & Video
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            const userType = localStorage.getItem("userType");
+                            if (userType === "guest") {
+                              toast({
+                                title: "Feature Restricted",
+                                description:
+                                  "Please create an account to send files.",
+                                variant: "destructive",
+                              });
+                            }
+                          }}
+                        >
                           <Mic className="h-4 w-4 mr-2" />
                           Audio
                         </DropdownMenuItem>
@@ -468,7 +506,7 @@ export default function StrangerChat() {
                             "😎",
                             "🤩",
                             "🥳",
-                            "����",
+                            "😏",
                             "😒",
                             "😞",
                             "😔",

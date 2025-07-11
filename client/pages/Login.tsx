@@ -36,8 +36,17 @@ export default function Login() {
     localStorage.setItem("username", email.split("@")[0]);
     localStorage.setItem("isAuthenticated", "true");
 
-    // Redirect to gender selection for registered users
-    navigate("/gender-selection");
+    // Check if user has already completed onboarding
+    const existingGender = localStorage.getItem("userGender");
+    const existingCountry = localStorage.getItem("userCountry");
+
+    if (existingGender && existingCountry) {
+      // Returning user, go directly to home
+      navigate("/home");
+    } else {
+      // New user, go to gender selection
+      navigate("/gender-selection");
+    }
   };
 
   const handleSignup = () => {
@@ -55,7 +64,7 @@ export default function Login() {
     localStorage.setItem("username", username);
     localStorage.setItem("isAuthenticated", "true");
 
-    // Redirect to gender selection
+    // New signup users always go to gender selection (first time)
     navigate("/gender-selection");
   };
 
