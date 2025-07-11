@@ -221,14 +221,37 @@ export default function VideoCall() {
       } else {
         // Fallback simulation
         setTimeout(() => {
+          const countries = [
+            "USA",
+            "Canada",
+            "Germany",
+            "Japan",
+            "Australia",
+            "Brazil",
+            "France",
+            "UK",
+            "India",
+            "Mexico",
+          ];
+          const genders = ["Male", "Female"];
+          const randomCountry =
+            countries[Math.floor(Math.random() * countries.length)];
+          const randomGender =
+            genders[Math.floor(Math.random() * genders.length)];
+
           setStrangerInfo({
-            country: "India",
-            gender: "Male",
+            country: randomCountry,
+            gender: randomGender,
             isConnected: true,
           });
           setIsConnecting(false);
           setIsConnected(true);
           startCallTimer();
+
+          // For demo: mirror local stream to remote video to show video is working
+          if (remoteVideoRef.current && localStreamRef.current) {
+            remoteVideoRef.current.srcObject = localStreamRef.current;
+          }
         }, 3000);
       }
     } catch (error) {
