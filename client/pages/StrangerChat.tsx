@@ -423,10 +423,7 @@ export default function StrangerChat() {
               /* Chat Interface */
               <>
                 {/* Messages */}
-                <CardContent
-                  className="flex-1 overflow-y-auto p-4 space-y-4"
-                  style={{ height: "calc(100vh - 300px)" }}
-                >
+                <CardContent className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
                   {messages.map((message) => (
                     <div
                       key={message.id}
