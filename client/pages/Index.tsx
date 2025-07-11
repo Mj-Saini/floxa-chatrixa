@@ -107,6 +107,13 @@ export default function Index() {
               share moments, and discover new perspectives from across the
               globe.
             </p>
+            {localStorage.getItem("userType") === "guest" && (
+              <div className="mt-6 inline-flex items-center px-4 py-2 bg-orange-500/10 border border-orange-500/20 rounded-full">
+                <span className="text-orange-400 text-sm font-medium">
+                  👋 Guest Mode - Text & Video Chat Available
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Quick Actions */}
