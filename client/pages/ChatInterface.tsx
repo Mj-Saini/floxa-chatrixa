@@ -365,17 +365,25 @@ export default function ChatInterface() {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        const imageMessage: Message = {
+        let fileType: "image" | "video" = "image";
+        let content = "📷 Photo captured";
+
+        if (file.type.startsWith("video/")) {
+          fileType = "video";
+          content = "🎥 Video captured";
+        }
+
+        const mediaMessage: Message = {
           id: Date.now().toString(),
-          content: `📷 Photo captured`,
+          content,
           sender: "me",
           timestamp: new Date(),
-          type: "image",
+          type: fileType,
           fileUrl: e.target?.result as string,
           fileName: file.name,
           fileSize: file.size,
         };
-        setMessages((prev) => [...prev, imageMessage]);
+        setMessages((prev) => [...prev, mediaMessage]);
       };
       reader.readAsDataURL(file);
     }
@@ -522,7 +530,12 @@ export default function ChatInterface() {
                           className="max-w-full h-auto max-h-64 rounded-lg"
                           preload="metadata"
                         />
-                        <p className="text-xs opacity-75">{message.content}</p>
+                        <div className="text-xs opacity-75">
+                          <p>{message.content}</p>
+                          {message.fileName && (
+                            <p className="truncate">{message.fileName}</p>
+                          )}
+                        </div>
                       </div>
                     ) : message.type === "audio" && message.fileUrl ? (
                       <div className="space-y-2">
@@ -532,7 +545,12 @@ export default function ChatInterface() {
                           className="w-full max-w-xs"
                           preload="metadata"
                         />
-                        <p className="text-xs opacity-75">{message.content}</p>
+                        <div className="text-xs opacity-75">
+                          <p>{message.content}</p>
+                          {message.fileName && (
+                            <p className="truncate">{message.fileName}</p>
+                          )}
+                        </div>
                       </div>
                     ) : (
                       <p>{message.content}</p>
@@ -706,7 +724,7 @@ export default function ChatInterface() {
         ref={cameraInputRef}
         type="file"
         className="hidden"
-        accept="image/*"
+        accept="image/*,video/*"
         capture="environment"
         onChange={handleCameraCapture}
       />
