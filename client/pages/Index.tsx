@@ -47,7 +47,7 @@ export default function Index() {
       title: "Live Public Rooms",
       description: "Join active group conversations on various topics",
       color: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-      href: "/live-rooms",
+      href: "/home/live-rooms",
       gradient: "from-purple-400 to-pink-400",
     },
     {
@@ -55,7 +55,7 @@ export default function Index() {
       title: "Create Private Room",
       description: "Set up exclusive rooms for your circle",
       color: "bg-orange-500/10 text-orange-400 border-orange-500/20",
-      href: "/private-rooms",
+      href: "/home/private-rooms",
       gradient: "from-orange-400 to-red-400",
     },
     {
@@ -63,7 +63,7 @@ export default function Index() {
       title: "Group Chat",
       description: "Manage group conversations like WhatsApp",
       color: "bg-pink-500/10 text-pink-400 border-pink-500/20",
-      href: "/group-chat",
+      href: "/home/groups",
       gradient: "from-pink-400 to-rose-400",
     },
     {
@@ -71,7 +71,7 @@ export default function Index() {
       title: "Leaderboard",
       description: "See top users and earn your place",
       color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
-      href: "/leaderboard",
+      href: "/home/leaderboard",
       gradient: "from-yellow-400 to-amber-400",
     },
   ];
