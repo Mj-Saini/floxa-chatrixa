@@ -302,7 +302,7 @@ export default function StrangerChat() {
 
   return (
     <div className="h-screen bg-background flex flex-col">
-      <div className="flex-1 container mx-auto px-4 py-4 max-w-4xl flex flex-col">
+      <div className="flex-1 container mx-auto px-4 py-4 max-w-4xl flex flex-col h-[calc(100vh-4rem)]">
         <div className="flex flex-col h-full">
           {/* Header */}
           <Card className="bg-card/50 backdrop-blur-sm border-border/50 mb-4">
@@ -358,7 +358,7 @@ export default function StrangerChat() {
           </Card>
 
           {/* Chat Area */}
-          <Card className="flex-1 bg-card/50 backdrop-blur-sm border-border/50 flex flex-col h-[calc(100vh-12rem)]">
+          <Card className="flex-1 bg-card/50 backdrop-blur-sm border-border/50 flex flex-col overflow-hidden">
             {!isConnected && !isConnecting ? (
               /* Connection Screen */
               <CardContent className="flex-1 flex items-center justify-center">
