@@ -408,6 +408,35 @@ export default function VideoCall() {
     );
   }
 
+  if (!isConnected && isConnecting) {
+    // Show local video centered and large while searching
+    return (
+      <div className="min-h-screen bg-black flex flex-col items-center justify-center">
+        <PageHeader title="Video Call" subtitle="Connecting..." />
+        <div className="relative w-full max-w-2xl h-[60vh] flex items-center justify-center">
+          <video
+            ref={localVideoRef}
+            autoPlay
+            playsInline
+            muted
+            className="w-full h-full object-cover rounded-xl bg-gray-800"
+            style={{ maxWidth: 600, maxHeight: 400 }}
+          />
+          {!isVideoOn && (
+            <div className="absolute inset-0 bg-gray-900 flex items-center justify-center rounded-xl">
+              <VideoOff className="h-12 w-12 text-white" />
+            </div>
+          )}
+        </div>
+        <div className="text-center mt-8">
+          <h2 className="text-2xl font-semibold mb-2">Finding someone to chat...</h2>
+          <p className="text-muted-foreground mb-4">Please wait while we connect you with a stranger</p>
+          <Button onClick={handleEndCall} variant="outline">Cancel</Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-black">
       <PageHeader
