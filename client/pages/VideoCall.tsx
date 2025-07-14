@@ -16,6 +16,7 @@ import {
   Globe,
   Clock,
   AlertCircle,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import io, { Socket } from "socket.io-client";
@@ -409,34 +410,158 @@ export default function VideoCall() {
   }
 
   if (!isConnected && isConnecting) {
-    // Show local video centered and large while searching
+    // (leave as fullscreen, no header/footer)
     return (
-      <div className="min-h-screen bg-black flex flex-col items-center justify-center">
-        <PageHeader title="Video Call" subtitle="Connecting..." />
-        <div className="relative w-full max-w-2xl h-[60vh] flex items-center justify-center">
-          <video
-            ref={localVideoRef}
-            autoPlay
-            playsInline
-            muted
-            className="w-full h-full object-cover rounded-xl bg-gray-800"
-            style={{ maxWidth: 600, maxHeight: 400 }}
-          />
-          {!isVideoOn && (
-            <div className="absolute inset-0 bg-gray-900 flex items-center justify-center rounded-xl">
-              <VideoOff className="h-12 w-12 text-white" />
-            </div>
-          )}
+      <div className="min-h-screen min-w-screen bg-black flex flex-col items-center justify-center relative" style={{ width: '100vw', height: '100vh' }}>
+        <video
+          ref={localVideoRef}
+          autoPlay
+          playsInline
+          muted
+          className="fixed inset-0 w-full h-full object-cover z-0 bg-black"
+          style={{ width: '100vw', height: '100vh' }}
+        />
+        {!isVideoOn && (
+          <div className="fixed inset-0 bg-gray-900 flex items-center justify-center z-10">
+            <VideoOff className="h-20 w-20 text-white" />
+          </div>
+        )}
+        {/* Back button top-left */}
+        <div className="absolute top-6 left-6 z-30">
+          <Button onClick={handleEndCall} variant="outline" size="icon" className="rounded-full bg-black/60 hover:bg-black/80 border-white/30 text-white shadow-lg">
+            <X className="h-6 w-6" />
+          </Button>
         </div>
-        <div className="text-center mt-8">
-          <h2 className="text-2xl font-semibold mb-2">Finding someone to chat...</h2>
+        {/* Title and subtitle top-right */}
+        <div className="absolute top-6 right-8 z-30 text-right">
+          <h1 className="text-2xl font-bold text-white drop-shadow">Video Call</h1>
+          <p className="text-lg text-white/80 drop-shadow">Connecting...</p>
+        </div>
+        {/* Spinner and info center */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-20">
+          <div className="w-20 h-20 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-8" />
+          <h2 className="text-2xl font-semibold mb-2 text-white drop-shadow">Finding someone to chat...</h2>
           <p className="text-muted-foreground mb-4">Please wait while we connect you with a stranger</p>
-          <Button onClick={handleEndCall} variant="outline">Cancel</Button>
         </div>
       </div>
     );
   }
 
+  if (isConnected) {
+    // Fullscreen video call interface, no header/footer
+    return (
+      <div className="min-h-screen min-w-screen bg-black relative" style={{ width: '100vw', height: '100vh' }}>
+        {/* Remote Video (Main) */}
+        <div className="fixed inset-0 w-full h-full z-0">
+          <video
+            ref={remoteVideoRef}
+            autoPlay
+            playsInline
+            muted={false}
+            className="w-full h-full object-cover bg-gray-800"
+          />
+          {/* Placeholder when no remote video */}
+          {!strangerInfo.isConnected && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
+              <div className="text-center text-white">
+                <div className="w-24 h-24 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Video className="h-12 w-12 text-gray-400" />
+                </div>
+                <p>Waiting for stranger...</p>
+              </div>
+            </div>
+          )}
+        </div>
+        {/* Local Video (PiP) */}
+        <div className="absolute top-4 right-4 w-48 h-36 bg-gray-900 rounded-lg overflow-hidden border-2 border-white/20 z-10">
+          <video
+            ref={localVideoRef}
+            autoPlay
+            playsInline
+            muted
+            className="w-full h-full object-cover transform scale-x-[-1]"
+          />
+          <div className="absolute bottom-2 left-2 text-xs text-white bg-black/50 px-2 py-1 rounded">
+            You
+          </div>
+          {!isVideoOn && (
+            <div className="absolute inset-0 bg-gray-900 flex items-center justify-center">
+              <VideoOff className="h-8 w-8 text-white" />
+            </div>
+          )}
+        </div>
+        {/* Call Info */}
+        <div className="absolute top-4 left-4 z-10">
+          <div className="bg-black/50 backdrop-blur-sm border-white/20 rounded-lg p-3">
+            <div className="flex items-center space-x-4 text-white text-sm">
+              <div className="flex items-center space-x-1">
+                <div className="w-2 h-2 bg-green-400 rounded-full" />
+                <span>Connected</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <Clock className="h-4 w-4" />
+                <span>{formatDuration(callDuration)}</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <Globe className="h-4 w-4" />
+                <span>{strangerInfo.country}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* Controls */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10">
+          <div className="flex items-center space-x-4">
+            <Button
+              onClick={toggleAudio}
+              size="lg"
+              variant={isAudioOn ? "secondary" : "destructive"}
+              className="rounded-full w-14 h-14 p-0"
+            >
+              {isAudioOn ? (
+                <Mic className="h-6 w-6" />
+              ) : (
+                <MicOff className="h-6 w-6" />
+              )}
+            </Button>
+            <Button
+              onClick={handleEndCall}
+              size="lg"
+              variant="destructive"
+              className="rounded-full w-16 h-16 p-0 bg-red-500 hover:bg-red-600"
+            >
+              <PhoneOff className="h-8 w-8" />
+            </Button>
+            <Button
+              onClick={toggleVideo}
+              size="lg"
+              variant={isVideoOn ? "secondary" : "destructive"}
+              className="rounded-full w-14 h-14 p-0"
+            >
+              {isVideoOn ? (
+                <Video className="h-6 w-6" />
+              ) : (
+                <VideoOff className="h-6 w-6" />
+              )}
+            </Button>
+          </div>
+        </div>
+        {/* Skip Button */}
+        <div className="absolute bottom-8 right-8 z-10">
+          <Button
+            onClick={handleSkipUser}
+            variant="outline"
+            className="bg-black/50 backdrop-blur-sm border-white/20 text-white hover:bg-white/10"
+          >
+            <SkipForward className="h-4 w-4 mr-2" />
+            Next
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // When not connecting or connected, render inside normal layout (header/footer visible)
   return (
     <div className="min-h-screen bg-black">
       <PageHeader
