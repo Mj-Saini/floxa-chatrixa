@@ -27,6 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/use-toast";
+import io from "socket.io-client";
 
 interface Message {
   id: string;
@@ -53,13 +54,10 @@ export default function StrangerChat() {
   const [isConnecting, setIsConnecting] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
-  const [strangerInfo, setStrangerInfo] = useState({
-    country: "Unknown",
-    gender: "Unknown",
-    isTyping: false,
-    name: "Stranger",
-    avatar: "",
-  });
+  const [strangerInfo, setStrangerInfo] = useState<StrangerInfo | null>(null);
+  const [chatId, setChatId] = useState<string | null>(null);
+  const [waiting, setWaiting] = useState(false);
+  const socketRef = useRef<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
@@ -71,65 +69,125 @@ export default function StrangerChat() {
 
   useEffect(scrollToBottom, [messages]);
 
+  useEffect(() => {
+    // Clean up socket on unmount
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+  }, []);
+
   const handleConnect = () => {
     setIsConnecting(true);
-    // Simulate finding real user worldwide
-    setTimeout(() => {
+    setWaiting(true);
+    // Connect to WebSocket server
+    if (!socketRef.current) {
+      socketRef.current = io("/", { transports: ["websocket"] });
+    }
+    // Determine userId: real user or guest
+    const userType = localStorage.getItem("userType");
+    let userId: string | null = null;
+    if (userType === "guest") {
+      userId = localStorage.getItem("guestId");
+      if (!userId) {
+        userId = `guest-${Math.random().toString(36).substr(2, 9)}`;
+        localStorage.setItem("guestId", userId);
+      }
+    } else {
+      userId = localStorage.getItem("userId");
+    }
+    if (!userId) {
+      toast({ title: "Login Required", description: "You must be logged in to use Stranger Chat.", variant: "destructive" });
       setIsConnecting(false);
+      setWaiting(false);
+      return;
+    }
+    // Listen for match
+    socketRef.current.on("match-found", ({ chat, partner }) => {
+      setIsConnecting(false);
+      setWaiting(false);
       setIsConnected(true);
-
-      // Random real user data from different countries
-      const countries = [
-        "USA",
-        "Canada",
-        "Germany",
-        "Japan",
-        "Australia",
-        "Brazil",
-        "France",
-        "UK",
-        "India",
-        "Mexico",
-      ];
-      const genders = ["Male", "Female"];
-      const randomCountry =
-        countries[Math.floor(Math.random() * countries.length)];
-      const randomGender = genders[Math.floor(Math.random() * genders.length)];
-
+      setChatId(chat._id);
       setStrangerInfo({
-        country: randomCountry,
-        gender: randomGender,
+        country: partner.country || "Unknown",
+        gender: partner.gender || "Unknown",
         isTyping: false,
-        name: "Stranger",
-        avatar: "",
+        name: partner.username || "Stranger",
+        avatar: partner.avatar || "",
       });
       setMessages([
         {
-          id: "1",
-          content: `🌍 Connected to a real person from ${randomCountry}`,
+          id: "system-" + Date.now(),
+          content: `🌍 Connected to a person from ${partner.country || "Unknown"}`,
           sender: "me",
           timestamp: new Date(),
           type: "system",
         },
       ]);
-    }, 2000);
+    });
+    // Listen for stranger messages
+    socketRef.current.on("stranger-message-received", (data) => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          content: data.content,
+          sender: "stranger",
+          timestamp: new Date(data.timestamp),
+          type: "text",
+        },
+      ]);
+    });
+    // Listen for queue joined
+    socketRef.current.on("queue-joined", () => {
+      setIsConnecting(true);
+      setWaiting(true);
+    });
+    // Listen for queue left
+    socketRef.current.on("queue-left", () => {
+      setIsConnected(false);
+      setWaiting(false);
+      setIsConnecting(false);
+      setChatId(null);
+      setStrangerInfo(null);
+      setMessages([]);
+    });
+    // Listen for errors
+    socketRef.current.on("error", (err) => {
+      toast({ title: "Error", description: err.message || "Unknown error", variant: "destructive" });
+      setIsConnecting(false);
+      setWaiting(false);
+    });
+    // Join queue
+    socketRef.current.emit("join-stranger-queue", { userId });
   };
 
   const handleDisconnect = () => {
+    if (socketRef.current) {
+      const userId = localStorage.getItem("userId");
+      socketRef.current.emit("leave-stranger-queue", { userId });
+      socketRef.current.disconnect();
+      socketRef.current = null;
+    }
     setIsConnected(false);
+    setWaiting(false);
+    setIsConnecting(false);
+    setChatId(null);
+    setStrangerInfo(null);
     setMessages([]);
-    setStrangerInfo({
-      country: "Unknown",
-      gender: "Unknown",
-      name: "Stranger",
-      isTyping: false,
-      avatar: "",
-    });
   };
 
   const handleSendMessage = () => {
-    if (!newMessage.trim() || !isConnected) return;
-
+    if (!newMessage.trim() || !isConnected || !chatId) return;
+    const userType = localStorage.getItem("userType");
+    let userId: string | null = null;
+    if (userType === "guest") {
+      userId = localStorage.getItem("guestId");
+    } else {
+      userId = localStorage.getItem("userId");
+    }
+    if (!userId) return;
     const message: Message = {
       id: Date.now().toString(),
       content: newMessage,
@@ -137,36 +195,12 @@ export default function StrangerChat() {
       timestamp: new Date(),
       type: "text",
     };
-
     setMessages((prev) => [...prev, message]);
     setNewMessage("");
-
-    // Simulate stranger typing and response
-    setTimeout(() => {
-      setStrangerInfo((prev) => ({ ...prev, isTyping: true }));
-    }, 500);
-
-    setTimeout(() => {
-      const responses = [
-        "Hello! How are you doing today?",
-        "Nice to meet you! Where are you from?",
-        "That's interesting! Tell me more.",
-        "I'm doing well, thanks for asking!",
-        "What do you like to do for fun?",
-        "The weather is great here today!",
-      ];
-
-      const strangerMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: responses[Math.floor(Math.random() * responses.length)],
-        sender: "stranger",
-        timestamp: new Date(),
-        type: "text",
-      };
-
-      setMessages((prev) => [...prev, strangerMessage]);
-      setStrangerInfo((prev) => ({ ...prev, isTyping: false }));
-    }, 3000);
+    // Send message via socket
+    if (socketRef.current) {
+      socketRef.current.emit("stranger-message", { userId, content: message.content, chatId });
+    }
   };
 
   const handleSkip = () => {
@@ -349,10 +383,10 @@ export default function StrangerChat() {
                 <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                   <div className="flex items-center space-x-1">
                     <Globe className="h-4 w-4" />
-                    <span>{strangerInfo.country}</span>
+                    <span>{strangerInfo?.country}</span>
                   </div>
                   <div className="flex items-center space-x-1">
-                    <span>Gender: {strangerInfo.gender}</span>
+                    <span>Gender: {strangerInfo?.gender}</span>
                   </div>
                 </div>
               )}
@@ -436,16 +470,15 @@ export default function StrangerChat() {
                           {message.sender === "stranger" && (
                             <Avatar className="h-8 w-8 cursor-pointer hover:opacity-80 transition-opacity">
                               <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white text-sm">
-                                {strangerInfo.name?.[0]?.toUpperCase() || "S"}
+                                {strangerInfo?.name?.[0]?.toUpperCase() || "S"}
                               </AvatarFallback>
                             </Avatar>
                           )}
                           <div
-                            className={`px-4 py-2 rounded-2xl ${
-                              message.sender === "me"
-                                ? "bg-primary text-primary-foreground"
-                                : "bg-muted"
-                            }`}
+                            className={`px-4 py-2 rounded-2xl ${message.sender === "me"
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted"
+                              }`}
                           >
                             <div className="text-sm">
                               {message.type === "image" && message.fileUrl ? (
@@ -523,12 +556,12 @@ export default function StrangerChat() {
                     </div>
                   ))}
 
-                  {strangerInfo.isTyping && (
+                  {strangerInfo?.isTyping && (
                     <div className="flex justify-start">
                       <div className="flex items-end space-x-2 max-w-[70%]">
                         <Avatar className="h-8 w-8">
                           <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white text-sm">
-                            {strangerInfo.name?.[0]?.toUpperCase() || "S"}
+                            {strangerInfo?.name?.[0]?.toUpperCase() || "S"}
                           </AvatarFallback>
                         </Avatar>
                         <div className="px-4 py-3 rounded-2xl bg-muted">

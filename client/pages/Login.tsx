@@ -13,11 +13,23 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { MessageCircle, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login, register, checkUsername, user } = useAuth();
+  const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Redirect if user is already authenticated
+  React.useEffect(() => {
+    if (user) {
+      navigate("/home");
+    }
+  }, [user, navigate]);
 
   // Form states
   const [email, setEmail] = useState("");
@@ -25,47 +37,107 @@ export default function Login() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [username, setUsername] = useState("");
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email || !password) {
-      alert("Please fill in all fields");
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
       return;
     }
 
-    // Save authenticated user data
-    localStorage.setItem("userType", "registered");
-    localStorage.setItem("username", email.split("@")[0]);
-    localStorage.setItem("isAuthenticated", "true");
+    setIsLoading(true);
+    try {
+      await login(email, password);
+      toast({
+        title: "Success",
+        description: "Login successful!",
+      });
 
-    // Check if user has already completed onboarding
-    const existingGender = localStorage.getItem("userGender");
-    const existingCountry = localStorage.getItem("userCountry");
+      // Check if user has already completed onboarding
+      const existingGender = localStorage.getItem("userGender");
+      const existingCountry = localStorage.getItem("userCountry");
 
-    if (existingGender && existingCountry) {
-      // Returning user, go directly to home
-      navigate("/home");
-    } else {
-      // New user, go to gender selection
-      navigate("/gender-selection");
+      if (existingGender && existingCountry) {
+        // Returning user, go directly to home
+        navigate("/home");
+      } else {
+        // New user, go to gender selection
+        navigate("/gender-selection");
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Login failed",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleSignup = () => {
+  const handleSignup = async () => {
     if (!email || !password || !confirmPassword || !username) {
-      alert("Please fill in all fields");
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
       return;
     }
     if (password !== confirmPassword) {
-      alert("Passwords don't match");
+      toast({
+        title: "Error",
+        description: "Passwords don't match",
+        variant: "destructive",
+      });
       return;
     }
 
-    // Save new user data
-    localStorage.setItem("userType", "registered");
-    localStorage.setItem("username", username);
-    localStorage.setItem("isAuthenticated", "true");
+    if (password.length < 6) {
+      toast({
+        title: "Error",
+        description: "Password must be at least 6 characters long",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    // New signup users always go to gender selection (first time)
-    navigate("/gender-selection");
+    setIsLoading(true);
+    try {
+      await register({
+        username,
+        email,
+        password,
+        firstName: username, // You can add separate firstName field later
+      });
+
+      toast({
+        title: "Success",
+        description: "Account created successfully!",
+      });
+
+      // Check if user has already completed onboarding
+      const existingGender = localStorage.getItem("userGender");
+      const existingCountry = localStorage.getItem("userCountry");
+
+      if (existingGender && existingCountry) {
+        // Returning user, go directly to home
+        navigate("/home");
+      } else {
+        // New user, go to gender selection
+        navigate("/gender-selection");
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Registration failed",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -165,10 +237,11 @@ export default function Login() {
                   <Button
                     type="button"
                     onClick={handleLogin}
+                    disabled={isLoading}
                     className="w-full bg-primary hover:bg-primary/90"
                     size="lg"
                   >
-                    Sign In
+                    {isLoading ? "Signing In..." : "Sign In"}
                   </Button>
                 </form>
 
@@ -303,10 +376,11 @@ export default function Login() {
                   <Button
                     type="button"
                     onClick={handleSignup}
+                    disabled={isLoading}
                     className="w-full bg-primary hover:bg-primary/90"
                     size="lg"
                   >
-                    Create Account
+                    {isLoading ? "Creating Account..." : "Create Account"}
                   </Button>
                 </form>
 

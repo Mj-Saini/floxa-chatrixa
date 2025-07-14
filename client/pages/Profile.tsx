@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -19,45 +18,77 @@ import {
   MapPin,
   Calendar,
   Star,
-  MessageCircle,
   Settings,
   Edit,
   Save,
   X,
-  Phone,
   Mail,
   Globe,
-  Lock,
-  Bell,
-  Eye,
-  Shield,
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Profile() {
+  const { user, updateProfile } = useAuth();
+  const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const [profileData, setProfileData] = useState({
-    username: "Alex_2024",
-    fullName: "Alex Johnson",
-    email: "alex.johnson@email.com",
-    phone: "+1 234 567 8900",
-    bio: "Love connecting with people from around the world! 🌍",
-    country: "India",
-    gender: "Male",
-    age: "25",
-    interests: ["Technology", "Travel", "Music", "Movies"],
-    languages: ["English", "Hindi", "Spanish"],
-    profileVisibility: "public",
-    showOnlineStatus: true,
-    allowMessages: true,
-    allowCalls: true,
-    notifications: true,
+    username: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    bio: "",
+    country: "",
+    gender: "",
   });
 
   const [editData, setEditData] = useState(profileData);
 
-  const handleSave = () => {
-    setProfileData(editData);
-    setIsEditing(false);
+  // Update profile data when user changes
+  useEffect(() => {
+    if (user) {
+      const newProfileData = {
+        username: user.username || "",
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        email: user.email || "",
+        bio: user.bio || "",
+        country: user.country || "",
+        gender: user.gender || "",
+      };
+      setProfileData(newProfileData);
+      setEditData(newProfileData);
+    }
+  }, [user]);
+
+  const handleSave = async () => {
+    setIsLoading(true);
+    try {
+      await updateProfile({
+        firstName: editData.firstName,
+        lastName: editData.lastName,
+        bio: editData.bio,
+        country: editData.country,
+        gender: editData.gender as 'male' | 'female' | 'other',
+      });
+
+      setProfileData(editData);
+      setIsEditing(false);
+      toast({
+        title: "Success",
+        description: "Profile updated successfully!",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update profile",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -65,21 +96,18 @@ export default function Profile() {
     setIsEditing(false);
   };
 
-  const addInterest = (interest: string) => {
-    if (interest && !editData.interests.includes(interest)) {
-      setEditData({
-        ...editData,
-        interests: [...editData.interests, interest],
-      });
-    }
-  };
+  if (!user) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Loading Profile...</h1>
+          <p className="text-muted-foreground">Please wait while we load your profile data.</p>
+        </div>
+      </div>
+    );
+  }
 
-  const removeInterest = (interest: string) => {
-    setEditData({
-      ...editData,
-      interests: editData.interests.filter((i) => i !== interest),
-    });
-  };
+  console.log("Profile component rendered with user:", user);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -110,14 +138,17 @@ export default function Profile() {
                 <h2 className="text-xl font-semibold mb-2">
                   {profileData.username}
                 </h2>
+                <p className="text-sm text-muted-foreground mb-2">
+                  {profileData.firstName} {profileData.lastName}
+                </p>
                 <div className="space-y-2 text-sm text-muted-foreground">
                   <div className="flex items-center justify-center space-x-1">
                     <MapPin className="h-4 w-4" />
-                    <span>{profileData.country}</span>
+                    <span>{profileData.country || "Not set"}</span>
                   </div>
                   <div className="flex items-center justify-center space-x-1">
                     <Calendar className="h-4 w-4" />
-                    <span>Joined Jan 2024</span>
+                    <span>Joined {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "Recently"}</span>
                   </div>
                 </div>
                 <div className="flex justify-center space-x-2 mt-4">
@@ -177,9 +208,9 @@ export default function Profile() {
                     </Button>
                   ) : (
                     <div className="flex space-x-2">
-                      <Button onClick={handleSave} size="sm">
+                      <Button onClick={handleSave} size="sm" disabled={isLoading}>
                         <Save className="h-4 w-4 mr-2" />
-                        Save
+                        {isLoading ? "Saving..." : "Save"}
                       </Button>
                       <Button
                         onClick={handleCancel}
@@ -206,25 +237,49 @@ export default function Profile() {
                       <Label htmlFor="username">Username</Label>
                       <Input
                         id="username"
+                        value={profileData.username}
+                        disabled={true}
+                        className="bg-muted"
+                      />
+                      <p className="text-xs text-muted-foreground">Username cannot be changed</p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        value={profileData.email}
+                        disabled={true}
+                        className="bg-muted"
+                      />
+                      <p className="text-xs text-muted-foreground">Email cannot be changed</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName">First Name</Label>
+                      <Input
+                        id="firstName"
                         value={
-                          isEditing ? editData.username : profileData.username
+                          isEditing ? editData.firstName : profileData.firstName
                         }
                         onChange={(e) =>
-                          setEditData({ ...editData, username: e.target.value })
+                          setEditData({ ...editData, firstName: e.target.value })
                         }
                         disabled={!isEditing}
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="fullName">Full Name</Label>
+                      <Label htmlFor="lastName">Last Name</Label>
                       <Input
-                        id="fullName"
+                        id="lastName"
                         value={
-                          isEditing ? editData.fullName : profileData.fullName
+                          isEditing ? editData.lastName : profileData.lastName
                         }
                         onChange={(e) =>
-                          setEditData({ ...editData, fullName: e.target.value })
+                          setEditData({ ...editData, lastName: e.target.value })
                         }
                         disabled={!isEditing}
                       />
@@ -246,41 +301,6 @@ export default function Profile() {
                   </div>
                 </div>
 
-                {/* Contact Information */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium flex items-center space-x-2">
-                    <Mail className="h-5 w-5" />
-                    <span>Contact Information</span>
-                  </h3>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={isEditing ? editData.email : profileData.email}
-                        onChange={(e) =>
-                          setEditData({ ...editData, email: e.target.value })
-                        }
-                        disabled={!isEditing}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Phone</Label>
-                      <Input
-                        id="phone"
-                        value={isEditing ? editData.phone : profileData.phone}
-                        onChange={(e) =>
-                          setEditData({ ...editData, phone: e.target.value })
-                        }
-                        disabled={!isEditing}
-                      />
-                    </div>
-                  </div>
-                </div>
-
                 {/* Personal Details */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium flex items-center space-x-2">
@@ -288,7 +308,7 @@ export default function Profile() {
                     <span>Personal Details</span>
                   </h3>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="country">Country</Label>
                       <Select
@@ -326,176 +346,12 @@ export default function Profile() {
                           <SelectValue placeholder="Select gender" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Male">Male</SelectItem>
-                          <SelectItem value="Female">Female</SelectItem>
-                          <SelectItem value="Other">Other</SelectItem>
-                          <SelectItem value="Prefer not to say">
-                            Prefer not to say
-                          </SelectItem>
+                          <SelectItem value="male">Male</SelectItem>
+                          <SelectItem value="female">Female</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="age">Age</Label>
-                      <Input
-                        id="age"
-                        type="number"
-                        value={isEditing ? editData.age : profileData.age}
-                        onChange={(e) =>
-                          setEditData({ ...editData, age: e.target.value })
-                        }
-                        disabled={!isEditing}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Interests */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Interests</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {(isEditing
-                      ? editData.interests
-                      : profileData.interests
-                    ).map((interest) => (
-                      <Badge
-                        key={interest}
-                        variant="secondary"
-                        className="flex items-center space-x-1"
-                      >
-                        <span>{interest}</span>
-                        {isEditing && (
-                          <X
-                            className="h-3 w-3 cursor-pointer"
-                            onClick={() => removeInterest(interest)}
-                          />
-                        )}
-                      </Badge>
-                    ))}
-                    {isEditing && (
-                      <Input
-                        placeholder="Add interest..."
-                        className="w-32"
-                        onKeyPress={(e) => {
-                          if (e.key === "Enter") {
-                            addInterest(e.currentTarget.value);
-                            e.currentTarget.value = "";
-                          }
-                        }}
-                      />
-                    )}
-                  </div>
-                </div>
-
-                {/* Privacy Settings */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium flex items-center space-x-2">
-                    <Shield className="h-5 w-5" />
-                    <span>Privacy & Settings</span>
-                  </h3>
-
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label>Show Online Status</Label>
-                        <p className="text-sm text-muted-foreground">
-                          Let others see when you're online
-                        </p>
-                      </div>
-                      <Switch
-                        checked={
-                          isEditing
-                            ? editData.showOnlineStatus
-                            : profileData.showOnlineStatus
-                        }
-                        onCheckedChange={(checked) =>
-                          setEditData({
-                            ...editData,
-                            showOnlineStatus: checked,
-                          })
-                        }
-                        disabled={!isEditing}
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label>Allow Messages</Label>
-                        <p className="text-sm text-muted-foreground">
-                          Receive messages from other users
-                        </p>
-                      </div>
-                      <Switch
-                        checked={
-                          isEditing
-                            ? editData.allowMessages
-                            : profileData.allowMessages
-                        }
-                        onCheckedChange={(checked) =>
-                          setEditData({ ...editData, allowMessages: checked })
-                        }
-                        disabled={!isEditing}
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label>Allow Calls</Label>
-                        <p className="text-sm text-muted-foreground">
-                          Receive video and voice calls
-                        </p>
-                      </div>
-                      <Switch
-                        checked={
-                          isEditing
-                            ? editData.allowCalls
-                            : profileData.allowCalls
-                        }
-                        onCheckedChange={(checked) =>
-                          setEditData({ ...editData, allowCalls: checked })
-                        }
-                        disabled={!isEditing}
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label>Notifications</Label>
-                        <p className="text-sm text-muted-foreground">
-                          Receive push notifications
-                        </p>
-                      </div>
-                      <Switch
-                        checked={
-                          isEditing
-                            ? editData.notifications
-                            : profileData.notifications
-                        }
-                        onCheckedChange={(checked) =>
-                          setEditData({ ...editData, notifications: checked })
-                        }
-                        disabled={!isEditing}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Account Actions */}
-                <div className="pt-6 border-t">
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <Button variant="outline" className="flex-1">
-                      <Lock className="h-4 w-4 mr-2" />
-                      Change Password
-                    </Button>
-                    <Button variant="outline" className="flex-1">
-                      <MessageCircle className="h-4 w-4 mr-2" />
-                      Export Data
-                    </Button>
-                    <Button variant="destructive" className="flex-1">
-                      <X className="h-4 w-4 mr-2" />
-                      Delete Account
-                    </Button>
                   </div>
                 </div>
               </CardContent>

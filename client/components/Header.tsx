@@ -24,10 +24,12 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Header() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const isAuthPage = location.pathname === "/login";
@@ -38,8 +40,6 @@ export default function Header() {
   if (isAuthPage || isChatInterface) {
     return null;
   }
-
-  const userType = localStorage.getItem("userType");
 
   const allNavItems = [
     { href: "/home", label: "Home", icon: MessageCircle },
@@ -63,10 +63,9 @@ export default function Header() {
     },
   ];
 
-  const navItems =
-    userType === "guest"
-      ? allNavItems.filter((item) => item.guestAllowed)
-      : allNavItems;
+  const navItems = user
+    ? allNavItems
+    : allNavItems.filter((item) => item.guestAllowed);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
@@ -194,7 +193,7 @@ export default function Header() {
                         <User className="h-4 w-4 text-white" />
                       </div>
                       <span className="hidden md:block text-sm font-medium">
-                        Alex_2024
+                        {user?.username || "Guest"}
                       </span>
                     </div>
                   </Button>
@@ -203,7 +202,7 @@ export default function Header() {
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link to="/profile" className="flex items-center">
+                    <Link to="/home/profile" className="flex items-center">
                       <User className="mr-2 h-4 w-4" />
                       <span>Profile</span>
                     </Link>
@@ -227,7 +226,13 @@ export default function Header() {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-destructive">
+                  <DropdownMenuItem
+                    className="text-destructive"
+                    onClick={() => {
+                      logout();
+                      navigate("/login");
+                    }}
+                  >
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>
                   </DropdownMenuItem>
