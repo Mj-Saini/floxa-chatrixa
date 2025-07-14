@@ -62,6 +62,17 @@ export default function StrangerChat() {
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isConnectingRef = useRef(isConnecting);
+  const waitingRef = useRef(waiting);
+
+  useEffect(() => {
+    isConnectingRef.current = isConnecting;
+  }, [isConnecting]);
+
+  useEffect(() => {
+    waitingRef.current = waiting;
+  }, [waiting]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -125,6 +136,11 @@ export default function StrangerChat() {
           type: "system",
         },
       ]);
+      // Clear timeout if match is found
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+        searchTimeoutRef.current = null;
+      }
     });
     // Listen for stranger messages
     socketRef.current.on("stranger-message-received", (data) => {
@@ -152,15 +168,45 @@ export default function StrangerChat() {
       setChatId(null);
       setStrangerInfo(null);
       setMessages([]);
+      // Clear timeout if user leaves queue
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+        searchTimeoutRef.current = null;
+      }
     });
     // Listen for errors
     socketRef.current.on("error", (err) => {
       toast({ title: "Error", description: err.message || "Unknown error", variant: "destructive" });
       setIsConnecting(false);
       setWaiting(false);
+      // Clear timeout on error
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+        searchTimeoutRef.current = null;
+      }
     });
     // Join queue
     socketRef.current.emit("join-stranger-queue", { userId });
+
+    // Set timeout for no user found
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    searchTimeoutRef.current = setTimeout(() => {
+      if (isConnectingRef.current || waitingRef.current) {
+        toast({
+          title: "No users found",
+          description: "No one else is searching right now. Please try again later.",
+          variant: "destructive",
+        });
+        setIsConnecting(false);
+        setWaiting(false);
+        // Optionally, leave the queue
+        if (socketRef.current) {
+          socketRef.current.emit("leave-stranger-queue", { userId });
+        }
+      }
+    }, 15000); // 15 seconds
   };
 
   const handleDisconnect = () => {
