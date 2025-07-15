@@ -3,53 +3,62 @@
 ## Prerequisites
 - Vercel account
 - Git repository connected to Vercel
+- **Backend deployed separately** (Railway, Render, etc.)
+
+## Important: Backend Deployment Required
+
+Your application has a separate backend that needs to be deployed first. Follow the `BACKEND_DEPLOYMENT.md` guide to deploy your backend.
 
 ## Build Configuration
-This project uses a custom build setup with both client and server builds.
+This project uses a custom build setup for the frontend only.
 
 ### Build Commands
 - **Build Command**: `npm run build`
 - **Output Directory**: `dist/spa`
 - **Install Command**: `npm install`
 
-## Environment Variables
-Make sure to set these environment variables in your Vercel project settings:
+## Environment Variables (Set in Vercel Dashboard)
 
 ### Required
-- `MONGODB_URI`: Your MongoDB connection string
-- `JWT_SECRET`: A secure JWT secret key
-- `NODE_ENV`: Set to `production`
+- `VITE_API_URL`: Your deployed backend URL (e.g., `https://your-app.railway.app/api`)
 
-### Optional
-- `PORT`: Server port (Vercel will set this automatically)
-- `CLIENT_URL`: Your frontend URL
+### Example
+```
+VITE_API_URL=https://your-backend-url.com/api
+```
 
 ## Deployment Steps
 
-1. **Connect Repository**: Connect your Git repository to Vercel
-2. **Configure Build Settings**:
+1. **Deploy Backend First**: Follow `BACKEND_DEPLOYMENT.md`
+2. **Get Backend URL**: Note your backend deployment URL
+3. **Configure Vercel**:
    - Framework Preset: `Other`
    - Build Command: `npm run build`
    - Output Directory: `dist/spa`
    - Install Command: `npm install`
-3. **Set Environment Variables**: Add the required environment variables
-4. **Deploy**: Vercel will automatically build and deploy your application
+4. **Set Environment Variables**: Add `VITE_API_URL` with your backend URL
+5. **Deploy**: Vercel will build and deploy your frontend
 
 ## Project Structure
-- `client/`: React frontend application
-- `backend/`: Express.js API server
+- `client/`: React frontend application (deployed to Vercel)
+- `backend/`: Express.js API server (deployed separately)
 - `dist/spa/`: Built frontend files (for Vercel)
-- `dist/server/`: Built server files
 
 ## Notes
-- The frontend is a Single Page Application (SPA)
-- API routes are handled by the Express server
+- Only the frontend is deployed to Vercel
+- Backend must be deployed separately (Railway, Render, etc.)
+- Frontend communicates with backend via API calls
 - All routes redirect to the SPA for client-side routing
-- Builder.io has been completely removed to prevent deployment conflicts
+- Builder.io has been completely removed
 
 ## Troubleshooting
 If you encounter build errors:
-1. Check that all dependencies are properly installed
-2. Verify environment variables are set correctly
-3. Ensure MongoDB is accessible from Vercel's servers
-4. Check the build logs for specific error messages 
+1. Ensure backend is deployed and accessible
+2. Verify `VITE_API_URL` environment variable is set correctly
+3. Check that all dependencies are properly installed
+4. Review build logs for specific error messages
+
+## Common Issues
+- **404 Errors**: Usually means backend isn't deployed or URL is incorrect
+- **CORS Errors**: Backend needs proper CORS configuration
+- **Build Failures**: Check that all dependencies are in package.json 
