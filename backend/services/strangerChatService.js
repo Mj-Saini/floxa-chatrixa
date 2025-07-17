@@ -13,7 +13,7 @@ class StrangerChatService {
 
   setupSocketHandlers() {
     this.io.on('connection', (socket) => {
-      console.log('User connected:', socket.id);
+      console.log('🔌 New Socket.IO connection:', socket.id);
 
       // Join stranger chat queue
       socket.on('join-stranger-queue', async (data) => {
@@ -25,9 +25,19 @@ class StrangerChatService {
             return;
           }
 
+          console.log(`👤 User ${userId} joining queue via socket ${socket.id}`);
+
+          // Check if user is already connected with a different socket
+          const existingSocketId = this.activeUsers.get(userId);
+          if (existingSocketId && existingSocketId !== socket.id) {
+            console.log(`⚠️ User ${userId} already connected with socket ${existingSocketId}, updating to ${socket.id}`);
+          }
+
           // Store active user
           this.activeUsers.set(userId, socket.id);
           this.queueUsers.add(userId);
+
+          console.log(`📊 Active users: ${this.activeUsers.size}, Queue users: ${this.queueUsers.size}`);
 
           // Add to database queue
           await this.addToQueue(userId, preferences);
@@ -206,10 +216,17 @@ class StrangerChatService {
           ageRange: { min: 18, max: 99 },
           gender: 'any',
           interests: []
-        }
+        },
+        isOnline: true,
+        lastActivity: new Date()
       });
 
       await queueEntry.save();
+      // Always try to match all waiting users
+      const waitingUsers = await StrangerQueue.find({ status: 'waiting' });
+      for (const user of waitingUsers) {
+        await this.tryMatch(user.user.toString());
+      }
     } catch (error) {
       console.error('Add to queue error:', error);
     }
@@ -228,23 +245,16 @@ class StrangerChatService {
       const userQueue = await StrangerQueue.findOne({ user: userId, status: 'waiting' });
       if (!userQueue) return;
 
-      // Find a match
+      // Find another waiting user
       const match = await StrangerQueue.findOne({
         user: { $ne: userId },
         status: 'waiting',
         isOnline: true,
-        lastActivity: { $gte: new Date(Date.now() - 5 * 60 * 1000) }, // Active in last 5 minutes
-        $or: [
-          { 'preferences.gender': 'any' },
-          { 'preferences.gender': userQueue.preferences.gender },
-          { 'preferences.gender': 'any' }
-        ],
-        'preferences.ageRange.min': { $lte: userQueue.preferences.ageRange.max },
-        'preferences.ageRange.max': { $gte: userQueue.preferences.ageRange.min }
-      }).populate('user', 'username firstName lastName avatar');
+        lastActivity: { $gte: new Date(Date.now() - 5 * 60 * 1000) }
+      }).populate('user', 'username firstName lastName avatar country gender');
 
       if (match) {
-        // Create stranger chat
+        // Create chat
         const strangerChat = new StrangerChat({
           participants: [
             { user: userId },
@@ -268,27 +278,42 @@ class StrangerChatService {
         this.queueUsers.delete(match.user._id.toString());
 
         // Populate the chat with user details for the response
-        await strangerChat.populate('participants.user', 'username firstName lastName avatar');
+        await strangerChat.populate('participants.user', 'username firstName lastName avatar country gender');
 
-        // Notify both users
+        // Get user details for both users
+        const userDetails = await User.findById(userId).select('username firstName lastName avatar country gender');
+        const matchDetails = match.user;
+
+        // Robust notification logic
+        const notifyBoth = async (attempt = 1) => {
         const userSocketId = this.activeUsers.get(userId);
         const matchSocketId = this.activeUsers.get(match.user._id.toString());
+          let notified = true;
 
         if (userSocketId) {
           this.io.to(userSocketId).emit('match-found', {
             chat: strangerChat,
-            partner: match.user
+            partner: matchDetails
           });
+          } else {
+            notified = false;
         }
 
         if (matchSocketId) {
           this.io.to(matchSocketId).emit('match-found', {
             chat: strangerChat,
-            partner: { _id: userId }
+            partner: userDetails
           });
-        }
+          } else {
+            notified = false;
+          }
 
-        console.log(`Match found: ${userId} and ${match.user._id}`);
+          // If either socket is missing, retry up to 5 times with 200ms delay
+          if (!notified && attempt < 5) {
+            setTimeout(() => notifyBoth(attempt + 1), 200);
+          }
+        };
+        notifyBoth();
       }
     } catch (error) {
       console.error('Try match error:', error);
@@ -296,18 +321,17 @@ class StrangerChatService {
   }
 
   startMatchingService() {
-    // Run matching every 10 seconds
+    // Run matching every 2 seconds
     this.matchingInterval = setInterval(async () => {
       try {
         const waitingUsers = await StrangerQueue.find({ status: 'waiting' });
-        
         for (const user of waitingUsers) {
           await this.tryMatch(user.user.toString());
         }
       } catch (error) {
         console.error('Matching service error:', error);
       }
-    }, 10000);
+    }, 2000);
   }
 
   stopMatchingService() {

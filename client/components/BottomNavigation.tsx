@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { MessageCircle, Video, Users, Bell } from "lucide-react";
+import { MessageCircle, Video, Users, Bell, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
@@ -27,6 +27,18 @@ export default function BottomNavigation() {
       label: "Messages",
       icon: Users,
       badge: 3,
+      guestAllowed: false,
+    },
+    {
+      href: "/home/groups",
+      label: "Groups",
+      icon: Users,
+      guestAllowed: false,
+    },
+    {
+      href: "/home/calls",
+      label: "Calls",
+      icon: Phone,
       guestAllowed: false,
     },
   ];

@@ -69,22 +69,15 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
-      <div className="container mx-auto px-4">
+      {isStrangerChat ? (<>
+      </>) : (<div className="container mx-auto px-4">
+
+
         <div className="flex items-center justify-between h-16">
           {/* Stranger Chat - Back Button Only */}
           {isStrangerChat ? (
             <>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/home")}
-                className="flex items-center space-x-2"
-              >
-                <ArrowLeft className="h-5 w-5" />
-                <span>Back</span>
-              </Button>
-              <span className="text-lg font-semibold">Talk to Stranger</span>
-              <div className="w-20" /> {/* Spacer for centering */}
+
             </>
           ) : (
             <>
@@ -140,7 +133,7 @@ export default function Header() {
           )}
 
           {/* Right Side Actions - Only show when not in stranger chat */}
-          {!isStrangerChat && (
+          {!isStrangerChat ? (
             <div className="flex items-center space-x-3">
               {/* Notifications */}
               <DropdownMenu>
@@ -253,7 +246,7 @@ export default function Header() {
                 )}
               </Button>
             </div>
-          )}
+          ) : null}
         </div>
 
         {/* Mobile Navigation - Only on homepage */}
@@ -296,7 +289,7 @@ export default function Header() {
             </nav>
           </div>
         )}
-      </div>
+      </div>)}
     </header>
   );
 }

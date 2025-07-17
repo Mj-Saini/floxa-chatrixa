@@ -30,21 +30,21 @@ export default function ChatTabs({ children }: ChatTabsProps) {
       label: "Chats",
       icon: MessageCircle,
       count: 12,
-      href: "/chats",
+      href: "/home/chats",
     },
     {
       id: "groups",
       label: "Groups",
       icon: Users,
       count: 3,
-      href: "/groups",
+      href: "/home/groups",
     },
     {
       id: "calls",
       label: "Calls",
       icon: Phone,
       count: 0,
-      href: "/calls",
+      href: "/home/calls",
     },
   ];
 

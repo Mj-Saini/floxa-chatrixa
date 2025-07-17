@@ -80,42 +80,17 @@ export default function StrangerChat() {
 
   useEffect(scrollToBottom, [messages]);
 
+  // --- SOCKET SETUP AND EVENT LISTENERS ---
   useEffect(() => {
-    // Clean up socket on unmount
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-      }
-    };
-  }, []);
-
-  const handleConnect = () => {
-    setIsConnecting(true);
-    setWaiting(true);
-    // Connect to WebSocket server
+    // Create socket only once
     if (!socketRef.current) {
-      socketRef.current = io("/", { transports: ["websocket"] });
+      socketRef.current = io("http://localhost:3001", { transports: ["websocket"] });
     }
-    // Determine userId: real user or guest
-    const userType = localStorage.getItem("userType");
-    let userId: string | null = null;
-    if (userType === "guest") {
-      userId = localStorage.getItem("guestId");
-      if (!userId) {
-        userId = `guest-${Math.random().toString(36).substr(2, 9)}`;
-        localStorage.setItem("guestId", userId);
-      }
-    } else {
-      userId = localStorage.getItem("userId");
-    }
-    if (!userId) {
-      toast({ title: "Login Required", description: "You must be logged in to use Stranger Chat.", variant: "destructive" });
-      setIsConnecting(false);
-      setWaiting(false);
-      return;
-    }
+    const socket = socketRef.current;
+
     // Listen for match
-    socketRef.current.on("match-found", ({ chat, partner }) => {
+    const onMatchFound = ({ chat, partner }: any) => {
+      console.log(`🎉 Match found! Chat ID: ${chat._id}, Partner:`, partner);
       setIsConnecting(false);
       setWaiting(false);
       setIsConnected(true);
@@ -141,9 +116,11 @@ export default function StrangerChat() {
         clearTimeout(searchTimeoutRef.current);
         searchTimeoutRef.current = null;
       }
-    });
+    };
+    socket.on("match-found", onMatchFound);
+
     // Listen for stranger messages
-    socketRef.current.on("stranger-message-received", (data) => {
+    const onStrangerMessage = (data: any) => {
       setMessages((prev) => [
         ...prev,
         {
@@ -154,14 +131,18 @@ export default function StrangerChat() {
           type: "text",
         },
       ]);
-    });
+    };
+    socket.on("stranger-message-received", onStrangerMessage);
+
     // Listen for queue joined
-    socketRef.current.on("queue-joined", () => {
+    const onQueueJoined = () => {
       setIsConnecting(true);
       setWaiting(true);
-    });
+    };
+    socket.on("queue-joined", onQueueJoined);
+
     // Listen for queue left
-    socketRef.current.on("queue-left", () => {
+    const onQueueLeft = () => {
       setIsConnected(false);
       setWaiting(false);
       setIsConnecting(false);
@@ -173,9 +154,11 @@ export default function StrangerChat() {
         clearTimeout(searchTimeoutRef.current);
         searchTimeoutRef.current = null;
       }
-    });
+    };
+    socket.on("queue-left", onQueueLeft);
+
     // Listen for errors
-    socketRef.current.on("error", (err) => {
+    const onError = (err: any) => {
       toast({ title: "Error", description: err.message || "Unknown error", variant: "destructive" });
       setIsConnecting(false);
       setWaiting(false);
@@ -184,10 +167,52 @@ export default function StrangerChat() {
         clearTimeout(searchTimeoutRef.current);
         searchTimeoutRef.current = null;
       }
-    });
-    // Join queue
-    socketRef.current.emit("join-stranger-queue", { userId });
+    };
+    socket.on("error", onError);
 
+    // Clean up listeners and socket on unmount
+    return () => {
+      socket.off("match-found", onMatchFound);
+      socket.off("stranger-message-received", onStrangerMessage);
+      socket.off("queue-joined", onQueueJoined);
+      socket.off("queue-left", onQueueLeft);
+      socket.off("error", onError);
+      socket.disconnect();
+      socketRef.current = null;
+    };
+  }, [toast]);
+
+  // --- END SOCKET SETUP ---
+
+  const handleConnect = () => {
+    setIsConnecting(true);
+    setWaiting(true);
+    // Determine userId: real user or guest
+    const userType = localStorage.getItem("userType");
+    let userId: string | null = null;
+    if (userType === "guest") {
+      userId = localStorage.getItem("guestId");
+      if (!userId) {
+        userId = `guest-${Math.random().toString(36).substr(2, 9)}`;
+        localStorage.setItem("guestId", userId);
+      }
+    } else {
+      userId = localStorage.getItem("userId");
+    }
+    if (!userId) {
+      toast({ title: "Login Required", description: "You must be logged in to use Stranger Chat.", variant: "destructive" });
+      setIsConnecting(false);
+      setWaiting(false);
+      return;
+    }
+    // Join queue
+    const gender = localStorage.getItem("userGender") || "any";
+    const country = localStorage.getItem("userCountry") || "any";
+    const preferences = { gender, language: country };
+    console.log(`🔗 Joining queue with userId: ${userId}, preferences:`, preferences);
+    if (socketRef.current) {
+      socketRef.current.emit("join-stranger-queue", { userId, preferences });
+    }
     // Set timeout for no user found
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
@@ -211,8 +236,17 @@ export default function StrangerChat() {
 
   const handleDisconnect = () => {
     if (socketRef.current) {
-      const userId = localStorage.getItem("userId");
-      socketRef.current.emit("leave-stranger-queue", { userId });
+      const userType = localStorage.getItem("userType");
+      let userId: string | null = null;
+      if (userType === "guest") {
+        userId = localStorage.getItem("guestId");
+      } else {
+        userId = localStorage.getItem("userId");
+      }
+      if (userId) {
+        console.log(`🔗 Leaving queue with userId: ${userId}`);
+        socketRef.current.emit("leave-stranger-queue", { userId });
+      }
       socketRef.current.disconnect();
       socketRef.current = null;
     }
@@ -387,57 +421,45 @@ export default function StrangerChat() {
       <div className="flex-1 container mx-auto px-4 py-4 max-w-4xl flex flex-col h-[calc(100vh-4rem)]">
         <div className="flex flex-col h-full">
           {/* Header */}
-          <Card className="bg-card/50 backdrop-blur-sm border-border/50 mb-4">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center space-x-2">
-                  <MessageCircle className="h-6 w-6 text-primary" />
-                  <span>Talk to Stranger</span>
-                </CardTitle>
-                <div className="flex items-center space-x-2">
-                  {isConnected && (
-                    <>
-                      <Badge
-                        variant="secondary"
-                        className="bg-green-500/20 text-green-400"
-                      >
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-2" />
-                        Connected
-                      </Badge>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>View Profile</DropdownMenuItem>
-                          <DropdownMenuItem>
-                            Mute Notifications
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>Clear Chat</DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">
-                            Report User
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </>
-                  )}
-                </div>
-              </div>
-              {isConnected && (
-                <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                  <div className="flex items-center space-x-1">
-                    <Globe className="h-4 w-4" />
-                    <span>{strangerInfo?.country}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <span>Gender: {strangerInfo?.gender}</span>
+          {isConnected && strangerInfo && (
+            <Card className="bg-card/50 backdrop-blur-sm border-border/50 mb-4">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center space-x-2">
+                    <span className="font-bold text-lg text-primary capitalize">
+                      {strangerInfo.name || 'Stranger'}
+                    </span>
+                  </CardTitle>
+                  <div className="flex items-center space-x-2">
+                    <Badge
+                      variant="secondary"
+                      className="bg-green-500/20 text-green-400"
+                    >
+                      <div className="w-2 h-2 bg-green-500 rounded-full mr-2" />
+                      Connected
+                    </Badge>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem>View Profile</DropdownMenuItem>
+                        <DropdownMenuItem>
+                          Mute Notifications
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>Clear Chat</DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive">
+                          Report User
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
-              )}
-            </CardHeader>
-          </Card>
+              </CardHeader>
+            </Card>
+          )}
 
           {/* Chat Area */}
           <Card className="flex-1 bg-card/50 backdrop-blur-sm border-border/50 flex flex-col overflow-hidden">
@@ -510,6 +532,7 @@ export default function StrangerChat() {
                       {message.type === "system" ? (
                         <div className="text-center text-sm text-muted-foreground bg-muted/20 px-3 py-2 rounded-full">
                           {message.content}
+
                         </div>
                       ) : (
                         <div className="flex items-end space-x-2 max-w-[70%]">
@@ -625,7 +648,7 @@ export default function StrangerChat() {
                 </CardContent>
 
                 {/* Chat Input - Fixed at bottom */}
-                <div className="border-t border-border/30 p-4 bg-background">
+                <div className="border-t border-border/30 p-4 bg-background sticky bottom-0">
                   <div className="flex items-center space-x-2 mb-3">
                     <Button
                       onClick={handleSkip}

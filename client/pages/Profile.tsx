@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -33,6 +33,8 @@ export default function Profile() {
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [profileData, setProfileData] = useState({
     username: "",
@@ -60,20 +62,37 @@ export default function Profile() {
       };
       setProfileData(newProfileData);
       setEditData(newProfileData);
+      setProfileImage(user.avatar || null);
     }
   }, [user]);
+
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setProfileImage(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSave = async () => {
     setIsLoading(true);
     try {
+      // Simulate image upload
       await updateProfile({
         firstName: editData.firstName,
         lastName: editData.lastName,
         bio: editData.bio,
         country: editData.country,
         gender: editData.gender as 'male' | 'female' | 'other',
+        avatar: profileImage,
       });
-
       setProfileData(editData);
       setIsEditing(false);
       toast({
@@ -125,15 +144,27 @@ export default function Profile() {
             <Card className="bg-card/50 backdrop-blur-sm border-border/50">
               <CardContent className="p-6 text-center">
                 <div className="relative inline-block mb-4">
-                  <div className="h-24 w-24 rounded-full bg-gradient-to-br from-primary to-brand-pink flex items-center justify-center mx-auto">
-                    <User className="h-12 w-12 text-white" />
+                  <div className="h-24 w-24 rounded-full bg-gradient-to-br from-primary to-brand-pink flex items-center justify-center mx-auto overflow-hidden">
+                    {profileImage ? (
+                      <img src={profileImage} alt="Profile" className="h-24 w-24 object-cover" />
+                    ) : (
+                      <User className="h-12 w-12 text-white" />
+                    )}
                   </div>
                   <Button
                     size="sm"
                     className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full p-0"
+                    onClick={handleImageClick}
                   >
                     <Camera className="h-4 w-4" />
                   </Button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageChange}
+                  />
                 </div>
                 <h2 className="text-xl font-semibold mb-2">
                   {profileData.username}

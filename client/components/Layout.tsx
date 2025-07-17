@@ -20,7 +20,7 @@ export default function Layout({ children }: LayoutProps) {
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
       <main
-        className={`${isChatInterface ? "pt-0" : "pt-16"} flex-1 ${showBottomNav ? "pb-20" : ""}`}
+        className={`${isChatInterface ? "pt-0" : ""} flex-1 ${showBottomNav ? "pb-20" : ""}`}
       >
         {children || <Outlet />}
       </main>

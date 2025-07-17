@@ -17,10 +17,14 @@ import {
   Sparkles,
   Trophy,
   Globe,
+  CreditCard,
+  ArrowLeft,
 } from "lucide-react";
 
 export default function Membership() {
   const [selectedPlan, setSelectedPlan] = useState("pro");
+  const [showPayment, setShowPayment] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
 
   const plans = [
     {
@@ -159,9 +163,19 @@ export default function Membership() {
   };
 
   const handleUpgrade = () => {
-    const plan = plans.find((p) => p.id === selectedPlan);
-    console.log("Upgrading to:", plan?.name);
-    // Handle payment flow
+    setShowPayment(true);
+  };
+
+  const handlePayRazorpay = () => {
+    // Simulate payment success
+    setTimeout(() => {
+      setPaymentSuccess(true);
+    }, 1200);
+  };
+
+  const handleClosePayment = () => {
+    setShowPayment(false);
+    setPaymentSuccess(false);
   };
 
   return (
@@ -219,11 +233,10 @@ export default function Membership() {
             {plans.map((plan) => (
               <Card
                 key={plan.id}
-                className={`relative bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/30 transition-all duration-300 cursor-pointer ${
-                  selectedPlan === plan.id
+                className={`relative bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/30 transition-all duration-300 cursor-pointer ${selectedPlan === plan.id
                     ? "ring-2 ring-primary border-primary/50"
                     : ""
-                } ${plan.popular ? "scale-105" : ""}`}
+                  } ${plan.popular ? "scale-105" : ""}`}
                 onClick={() => handleSelectPlan(plan.id)}
               >
                 {plan.popular && (
@@ -282,15 +295,15 @@ export default function Membership() {
                   </div>
 
                   <Button
-                    className={`w-full ${
-                      selectedPlan === plan.id
+                    className={`w-full ${selectedPlan === plan.id
                         ? "bg-primary hover:bg-primary/90"
                         : ""
-                    }`}
+                      }`}
                     variant={selectedPlan === plan.id ? "default" : "outline"}
                     onClick={(e) => {
                       e.stopPropagation();
                       handleSelectPlan(plan.id);
+                      handleUpgrade();
                     }}
                   >
                     {plan.id === "free" ? "Current Plan" : "Select Plan"}
@@ -355,6 +368,40 @@ export default function Membership() {
           </div>
         </div>
       </div>
+      {/* Payment Modal */}
+      {showPayment && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-background rounded-lg p-8 shadow-lg w-full max-w-md relative">
+            <Button size="icon" variant="ghost" className="absolute top-4 right-4" onClick={handleClosePayment}>
+              <X className="h-5 w-5" />
+            </Button>
+            {!paymentSuccess ? (
+              <>
+                <div className="flex items-center mb-4">
+                  <CreditCard className="h-6 w-6 text-primary mr-2" />
+                  <h2 className="text-xl font-bold">Payment Method</h2>
+                </div>
+                <div className="mb-6">
+                  <div className="flex items-center space-x-3">
+                    <img src="https://razorpay.com/favicon.png" alt="Razorpay" className="h-6 w-6" />
+                    <span className="font-semibold">Razorpay</span>
+                  </div>
+                  <p className="text-muted-foreground text-sm mt-2">Pay securely with UPI, cards, net banking, and more.</p>
+                </div>
+                <Button className="w-full" onClick={handlePayRazorpay}>
+                  Pay with Razorpay
+                </Button>
+              </>
+            ) : (
+              <div className="text-center py-8">
+                <h2 className="text-2xl font-bold mb-2 text-green-600">Payment Successful!</h2>
+                <p className="text-muted-foreground mb-4">Your membership has been upgraded. Enjoy premium features!</p>
+                <Button onClick={handleClosePayment}>Close</Button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

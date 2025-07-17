@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +15,7 @@ import {
 } from "lucide-react";
 
 export default function WalletPage() {
+  const navigate = useNavigate();
   const transactions = [
     {
       id: 1,
@@ -99,13 +101,14 @@ export default function WalletPage() {
 
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <Button className="h-14 flex items-center space-x-2">
+            <Button className="h-14 flex items-center space-x-2" onClick={() => navigate('/wallet/withdraw')}>
               <Download className="h-5 w-5" />
               <span>Withdraw Money</span>
             </Button>
             <Button
               variant="outline"
               className="h-14 flex items-center space-x-2"
+              onClick={() => navigate('/wallet/refer')}
             >
               <Gift className="h-5 w-5" />
               <span>Refer Friends</span>
@@ -113,6 +116,7 @@ export default function WalletPage() {
             <Button
               variant="outline"
               className="h-14 flex items-center space-x-2"
+              onClick={() => navigate('/wallet/earn')}
             >
               <Upload className="h-5 w-5" />
               <span>Earn More Points</span>
@@ -136,11 +140,10 @@ export default function WalletPage() {
                   >
                     <div className="flex items-center space-x-3">
                       <div
-                        className={`p-2 rounded-full ${
-                          transaction.type === "earned"
-                            ? "bg-green-500/20 text-green-400"
-                            : "bg-red-500/20 text-red-400"
-                        }`}
+                        className={`p-2 rounded-full ${transaction.type === "earned"
+                          ? "bg-green-500/20 text-green-400"
+                          : "bg-red-500/20 text-red-400"
+                          }`}
                       >
                         {transaction.type === "earned" ? (
                           <TrendingUp className="h-4 w-4" />
@@ -160,11 +163,10 @@ export default function WalletPage() {
                     </div>
                     <div className="text-right">
                       <div
-                        className={`font-semibold ${
-                          transaction.amount > 0
-                            ? "text-green-400"
-                            : "text-red-400"
-                        }`}
+                        className={`font-semibold ${transaction.amount > 0
+                          ? "text-green-400"
+                          : "text-red-400"
+                          }`}
                       >
                         {transaction.amount > 0 ? "+" : ""}
                         {transaction.amount} points

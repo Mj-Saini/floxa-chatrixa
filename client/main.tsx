@@ -34,6 +34,11 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Cookies from "./pages/Cookies";
 import NotFound from "./pages/NotFound";
+import Settings from "./pages/Settings";
+import WithdrawMoney from "./pages/WithdrawMoney";
+import ReferFriend from "./pages/ReferFriend";
+import EarnMore from "./pages/EarnMore";
+import AboutWallet from "./pages/AboutWallet";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +54,17 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/gender-selection" element={<GenderSelection />} />
             <Route path="/guest-setup" element={<GuestSetup />} />
+            {/* Top-level wallet route */}
+            <Route path="/wallet" element={<ProtectedRoute guestAllowed={false}><Wallet /></ProtectedRoute>} />
+            {/* Top-level settings route */}
+            <Route path="/settings" element={<ProtectedRoute guestAllowed={false}><Settings /></ProtectedRoute>} />
+            {/* Top-level membership route */}
+            <Route path="/membership" element={<ProtectedRoute guestAllowed={false}><Membership /></ProtectedRoute>} />
+            {/* Wallet sub-pages */}
+            <Route path="/wallet/about" element={<ProtectedRoute guestAllowed={false}><AboutWallet /></ProtectedRoute>} />
+            <Route path="/wallet/withdraw" element={<ProtectedRoute guestAllowed={false}><WithdrawMoney /></ProtectedRoute>} />
+            <Route path="/wallet/refer" element={<ProtectedRoute guestAllowed={false}><ReferFriend /></ProtectedRoute>} />
+            <Route path="/wallet/earn" element={<ProtectedRoute guestAllowed={false}><EarnMore /></ProtectedRoute>} />
             <Route
               path="/home"
               element={
@@ -181,12 +197,12 @@ const App = () => (
               <Route path="refer" element={<Wallet />} />
               <Route path="settings" element={<Profile />} />
             </Route>
-                      <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
   </AuthProvider>
 );
 
-    createRoot(document.getElementById("root")!).render(<App />);
+createRoot(document.getElementById("root")!).render(<App />);

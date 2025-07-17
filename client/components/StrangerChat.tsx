@@ -54,26 +54,32 @@ const StrangerChat: React.FC<StrangerChatProps> = ({ onClose }) => {
     const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
-        // Initialize WebSocket connection
-        socketRef.current = new WebSocket(`ws://localhost:5000`);
+        // Initialize Socket.IO connection
+        socketRef.current = io("http://localhost:3001", { transports: ["websocket"] });
 
-        socketRef.current.onopen = () => {
-            console.log('WebSocket connected');
-        };
+        socketRef.current.on("connect", () => {
+            console.log("Socket.IO connected");
+        });
 
-        socketRef.current.onmessage = (event: MessageEvent) => {
-            const data = JSON.parse(event.data);
-            handleSocketMessage(data);
-        };
-
-        socketRef.current.onerror = (error: any) => {
-            console.error('WebSocket error:', error);
-            toast.error('Connection error');
-        };
+        socketRef.current.on("match-found", (data) => {
+            handleSocketMessage({ type: "match-found", ...data });
+        });
+        socketRef.current.on("stranger-message-received", (data) => {
+            handleSocketMessage({ type: "stranger-message-received", ...data });
+        });
+        socketRef.current.on("stranger-chat-ended", (data) => {
+            handleSocketMessage({ type: "stranger-chat-ended", ...data });
+        });
+        socketRef.current.on("queue-update", (data) => {
+            handleSocketMessage({ type: "queue-update", ...data });
+        });
+        socketRef.current.on("error", (error) => {
+            console.error("Socket.IO error:", error);
+        });
 
         return () => {
             if (socketRef.current) {
-                socketRef.current.close();
+                socketRef.current.disconnect();
             }
             if (queuePollInterval.current) {
                 clearInterval(queuePollInterval.current);
@@ -141,13 +147,12 @@ const StrangerChat: React.FC<StrangerChatProps> = ({ onClose }) => {
                 setMessages(data.chat.messages || []);
                 toast.success('Match found! You are now connected with a stranger.');
             } else {
-                // Join WebSocket queue
-                if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-                    socketRef.current.send(JSON.stringify({
-                        type: 'join-stranger-queue',
+                // Join Socket.IO queue
+                if (socketRef.current && socketRef.current.connected) {
+                    socketRef.current.emit('join-stranger-queue', {
                         userId: user?._id,
                         preferences
-                    }));
+                    });
                 }
 
                 // Start polling for queue status
@@ -199,12 +204,11 @@ const StrangerChat: React.FC<StrangerChatProps> = ({ onClose }) => {
                 }
             });
 
-            // Leave WebSocket queue
-            if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-                socketRef.current.send(JSON.stringify({
-                    type: 'leave-stranger-queue',
+            // Leave Socket.IO queue
+            if (socketRef.current && socketRef.current.connected) {
+                socketRef.current.emit('leave-stranger-queue', {
                     userId: user?._id
-                }));
+                });
             }
 
             // Stop polling
@@ -265,13 +269,12 @@ const StrangerChat: React.FC<StrangerChatProps> = ({ onClose }) => {
                 body: JSON.stringify(messageData)
             });
 
-            // Send via WebSocket
-            if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-                socketRef.current.send(JSON.stringify({
-                    type: 'stranger-message',
+            // Send via Socket.IO
+            if (socketRef.current && socketRef.current.connected) {
+                socketRef.current.emit('stranger-message', {
                     userId: user?._id,
                     ...messageData
-                }));
+                });
             }
 
             // Add message locally
