@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ChatTabs from "@/components/ChatTabs";
 import ChatList from "@/components/ChatList";
 import { Input } from "@/components/ui/input";
@@ -154,7 +154,7 @@ export default function Groups() {
   );
 
   const handleGroupClick = (groupId: string) => {
-    navigate(`/chat/${groupId}`);
+    navigate(`/home/chat/${groupId}`);
   };
 
   const getRoleIcon = (role: string) => {
@@ -213,10 +213,11 @@ export default function Groups() {
             <div className="space-y-1">
               {/* Show created groups first */}
               {createdGroups.map((group) => (
-                <div
+                <Link
+                  to={`/home/groups/chat/${group.id}`}
                   key={group.id}
                   className="flex items-center p-3 hover:bg-muted/30 cursor-pointer rounded-lg transition-colors bg-primary/5 border border-primary/20"
-                  onClick={() => handleGroupClick(group.id)}
+                  // onClick={() => handleGroupClick(group.id)}
                 >
                   {/* Avatar */}
                   <div className="relative mr-3">
@@ -260,7 +261,7 @@ export default function Groups() {
                           className="h-7 px-2"
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/chat/${group.id}`);
+                            navigate(`/home/chat/${group.id}`);
                           }}
                         >
                           💬
@@ -290,15 +291,15 @@ export default function Groups() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
 
               {/* Show existing groups */}
               {filteredGroups.map((group) => (
-                <div
+                <Link
                   key={group.id}
                   className="flex items-center p-3 hover:bg-muted/30 cursor-pointer rounded-lg transition-colors"
-                  onClick={() => handleGroupClick(group.id)}
+                  to={`/home/groups/chat/${group.id}`}
                 >
                   {/* Avatar */}
                   <div className="relative mr-3">
@@ -342,7 +343,7 @@ export default function Groups() {
                           className="h-7 px-2"
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/chat/${group.id}`);
+                            navigate(`/home/groups/chat/${group.id}`);
                           }}
                         >
                           💬
@@ -380,7 +381,7 @@ export default function Groups() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

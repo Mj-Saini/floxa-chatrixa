@@ -177,6 +177,32 @@ class StrangerChatService {
         }
       });
 
+      // On connection, check if user is already matched but missed notification
+      socket.on('register-user', async (data) => {
+        const { userId } = data;
+        if (userId) {
+          this.activeUsers.set(userId, socket.id);
+          // Check if user is in a matched chat but not notified
+          const matchedQueue = await StrangerQueue.findOne({ user: userId, status: 'matched' });
+          if (matchedQueue) {
+            // Find the chat
+            const chat = await StrangerChat.findOne({
+              'participants.user': userId,
+              status: 'active'
+            }).populate('participants.user', 'username firstName lastName avatar country gender');
+            if (chat) {
+              // Find partner
+              const partner = chat.participants.find(p => p.user._id.toString() !== userId);
+              const partnerDetails = partner ? partner.user : null;
+              socket.emit('match-found', {
+                chat,
+                partner: partnerDetails
+              });
+            }
+          }
+        }
+      });
+
       // Disconnect handler
       socket.on('disconnect', async () => {
         console.log('User disconnected:', socket.id);
@@ -286,31 +312,31 @@ class StrangerChatService {
 
         // Robust notification logic
         const notifyBoth = async (attempt = 1) => {
-        const userSocketId = this.activeUsers.get(userId);
-        const matchSocketId = this.activeUsers.get(match.user._id.toString());
+          const userSocketId = this.activeUsers.get(userId);
+          const matchSocketId = this.activeUsers.get(match.user._id.toString());
           let notified = true;
 
-        if (userSocketId) {
-          this.io.to(userSocketId).emit('match-found', {
-            chat: strangerChat,
-            partner: matchDetails
-          });
-          } else {
-            notified = false;
-        }
-
-        if (matchSocketId) {
-          this.io.to(matchSocketId).emit('match-found', {
-            chat: strangerChat,
-            partner: userDetails
-          });
+          if (userSocketId) {
+            this.io.to(userSocketId).emit('match-found', {
+              chat: strangerChat,
+              partner: matchDetails
+            });
           } else {
             notified = false;
           }
 
-          // If either socket is missing, retry up to 5 times with 200ms delay
-          if (!notified && attempt < 5) {
-            setTimeout(() => notifyBoth(attempt + 1), 200);
+          if (matchSocketId) {
+            this.io.to(matchSocketId).emit('match-found', {
+              chat: strangerChat,
+              partner: userDetails
+            });
+          } else {
+            notified = false;
+          }
+
+          // If either socket is missing, retry up to 10 times with 500ms delay
+          if (!notified && attempt < 10) {
+            setTimeout(() => notifyBoth(attempt + 1), 500);
           }
         };
         notifyBoth();

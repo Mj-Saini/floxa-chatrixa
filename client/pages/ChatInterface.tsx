@@ -116,7 +116,6 @@ export default function ChatInterface() {
     "😤",
     "😠",
     "😡",
-    "��",
     "🤯",
     "😳",
     "🥵",
@@ -180,15 +179,45 @@ export default function ChatInterface() {
   ];
 
   // Mock chat data - in real app this would come from API
-  const chatUser: ChatUser = {
-    id: chatId || "1",
-    name: chatId === "2" ? "Tech Team" : "Sarah Johnson",
-    avatar: "",
-    isOnline: true,
-    lastSeen: "2 minutes ago",
-    isGroup: chatId === "2",
-    members: chatId === "2" ? 24 : undefined,
-  };
+  // Support /home/groups/chat/:groupId as well as /home/chat/:chatId
+  const groupIds = ["1", "2", "3", "4"];
+  const isGroup = chatId && groupIds.includes(chatId);
+  const chatUser: ChatUser = isGroup
+    ? {
+      id: chatId || "1",
+      name:
+        chatId === "1"
+          ? "Tech Team"
+          : chatId === "2"
+            ? "Family Group"
+            : chatId === "3"
+              ? "Design Squad"
+              : chatId === "4"
+                ? "Book Club"
+                : "Group Chat",
+      avatar: "", // fallback to empty string if not set
+      isOnline: true,
+      lastSeen: "2 minutes ago",
+      isGroup: true,
+      members:
+        chatId === "1"
+          ? 24
+          : chatId === "2"
+            ? 8
+            : chatId === "3"
+              ? 15
+              : chatId === "4"
+                ? 45
+                : 10,
+    }
+    : {
+      id: chatId || "1",
+      name: "Sarah Johnson",
+      avatar: "",
+      isOnline: true,
+      lastSeen: "2 minutes ago",
+      isGroup: false,
+    };
 
   // Mock messages
   useEffect(() => {
@@ -462,8 +491,7 @@ export default function ChatInterface() {
   };
 
   return (
-    <div className="h-screen bg-background flex flex-col">
-      {/* Chat Header */}
+    <div className="flex flex-col h-screen bg-background">
       <ChatHeader user={chatUser} isTyping={isTyping} />
 
       {/* Messages Area - Fixed height with scroll */}

@@ -100,6 +100,14 @@ const App = () => (
                 }
               />
               <Route
+                path="groups/chat/:groupId"
+                element={
+                  <ProtectedRoute guestAllowed={false}>
+                    <ChatInterface />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="groups"
                 element={
                   <ProtectedRoute guestAllowed={false}>
