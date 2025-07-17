@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import PageHeader from "@/components/PageHeader";
+import BackButton from "@/components/BackButton";
 import {
   Video,
   VideoOff,
@@ -330,6 +331,9 @@ export default function VideoCall() {
   if (!isConnected && !isConnecting) {
     return (
       <div className="min-h-screen bg-background">
+        <div className="absolute top-4 left-4 z-20">
+          <BackButton showText={false} variant="outline" />
+        </div>
         <PageHeader
           title="Video Call"
           subtitle="Connect face-to-face with strangers worldwide"
@@ -564,6 +568,9 @@ export default function VideoCall() {
   // When not connecting or connected, render inside normal layout (header/footer visible)
   return (
     <div className="min-h-screen bg-black">
+      <div className="absolute top-4 left-4 z-20">
+        <BackButton showText={false} variant="outline" />
+      </div>
       <PageHeader
         title="Video Call"
         subtitle={

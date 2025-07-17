@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/use-toast";
 import io from "socket.io-client";
+import BackButton from "@/components/BackButton";
 
 interface Message {
   id: string;
@@ -418,6 +419,10 @@ export default function StrangerChat() {
 
   return (
     <div className="h-screen bg-background flex flex-col">
+      <div className="flex items-center p-4">
+        <BackButton showText={false} />
+        <h2 className="ml-3 text-xl font-bold">Stranger Chat</h2>
+      </div>
       <div className="flex-1 container mx-auto px-4 py-4 max-w-4xl flex flex-col h-[calc(100vh-4rem)]">
         <div className="flex flex-col h-full">
           {/* Header */}
