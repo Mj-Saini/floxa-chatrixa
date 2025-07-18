@@ -1,4 +1,4 @@
-import React from "react";
+
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -41,7 +41,7 @@ export default function ChatHeader({
   };
 
   return (
-    <div className="flex items-center justify-between p-4 bg-background border-b border-border/50">
+    <div className="flex items-center justify-between  bg-background border-b border-border/50">
       <div className="flex items-center space-x-3">
         <Button
           variant="ghost"
@@ -52,13 +52,13 @@ export default function ChatHeader({
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div
-          className="flex items-center space-x-3 cursor-pointer hover:bg-muted/50 p-2 rounded-lg transition-colors"
+          className="flex !m-0 items-center space-x-1 md:space-x-3 cursor-pointer hover:bg-muted/50 py-2 rounded-lg transition-colors"
           onClick={handleProfileClick}
         >
           <div className="relative">
-            <Avatar className="h-10 w-10">
+            <Avatar className="h-6 md:h-10 w-6 md:w-10">
               <AvatarImage src={user.avatar} alt={user.name} />
-              <AvatarFallback className="bg-gradient-to-br from-primary to-brand-pink text-white font-semibold">
+              <AvatarFallback className="bg-gradient-to-br  from-primary to-brand-pink text-white font-semibold">
                 {user.name
                   .split(" ")
                   .map((n) => n[0])
@@ -71,8 +71,8 @@ export default function ChatHeader({
             )}
           </div>
           <div>
-            <h3 className="font-medium">{user.name}</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="font-medium text-xs line-clamp-1">{user.name}</h3>
+            <p className="text-[10px] text-muted-foreground">
               {user.isGroup
                 ? `${user.members} members`
                 : isTyping
@@ -85,7 +85,7 @@ export default function ChatHeader({
         </div>
       </div>
 
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-0.5 md:space-x-2">
         <Button
           variant="ghost"
           size="sm"

@@ -614,7 +614,7 @@ export default function StrangerChat() {
                                 <p>{message.content}</p>
                               )}
                             </div>
-                            <p className="text-xs opacity-70 mt-1">
+                              <p className="text-[10px] opacity-70 mt-1">
                               {formatTime(message.timestamp)}
                             </p>
                           </div>

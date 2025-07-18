@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Loader2, MessageCircle, Users, X, Star } from 'lucide-react';
 import { toast } from 'sonner';
+import { io } from "socket.io-client";
 
 interface StrangerChatProps {
     onClose: () => void;
@@ -54,8 +55,15 @@ const StrangerChat: React.FC<StrangerChatProps> = ({ onClose }) => {
     const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
+        // Import io from socket.io-client if not already imported
+        //  // <-- Make sure this is at the top of your file
+
         // Initialize Socket.IO connection
-        socketRef.current = io("http://localhost:3001", { transports: ["websocket"] });
+        if (!socketRef.current) {
+            socketRef.current = (window as any).io
+                ? (window as any).io("http://localhost:3001", { transports: ["websocket"] })
+                : require("socket.io-client").io("http://localhost:3001", { transports: ["websocket"] });
+        }
 
         socketRef.current.on("connect", () => {
             console.log("Socket.IO connected");
@@ -459,7 +467,7 @@ const StrangerChat: React.FC<StrangerChatProps> = ({ onClose }) => {
                                                     }`}
                                             >
                                                 <p className="text-sm">{message.content}</p>
-                                                <p className="text-xs opacity-70 mt-1">
+                                                <p className="text-[10px] opacity-70 mt-1">
                                                     {new Date(message.timestamp).toLocaleTimeString()}
                                                 </p>
                                             </div>

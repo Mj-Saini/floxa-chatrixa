@@ -36,6 +36,9 @@ export default function Header() {
   const isHomepage = location.pathname === "/";
   const isChatInterface = location.pathname.startsWith("/chat/");
   const isStrangerChat = location.pathname === "/home/stranger-chat";
+  // Check if the current route is a group chat (matches /home/groups/chat/:id)
+  const isGroupChat = /^\/home\/groups\/chat\/[^/]+$/.test(location.pathname);
+  // const isGroupChat = location.pathname === "/home/groups/chat/:id";
 
   if (isAuthPage || isChatInterface) {
     return null;
@@ -69,7 +72,7 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
-      {isStrangerChat ? (<>
+      {isStrangerChat || isGroupChat ? (<>
       </>) : (<div className="container mx-auto px-4">
 
 

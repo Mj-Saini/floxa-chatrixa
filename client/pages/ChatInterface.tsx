@@ -486,9 +486,7 @@ export default function ChatInterface() {
     });
   };
 
-  const handleProfileClick = () => {
-    navigate(`/profile/${chatUser.id}`);
-  };
+
 
   return (
     <div className="flex flex-col h-screen bg-background">
@@ -531,7 +529,7 @@ export default function ChatInterface() {
               ) : (
                 <div
                   className={cn(
-                    "p-3 rounded-lg relative group cursor-pointer",
+                    "p-1.5 md:p-3 rounded-lg relative group cursor-pointer",
                     message.sender === "me"
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted",
@@ -542,7 +540,7 @@ export default function ChatInterface() {
                     )
                   }
                 >
-                  <div className="text-sm">
+                  <div className="text-xs md:text-sm">
                     {message.type === "image" && message.fileUrl ? (
                       <div className="space-y-2">
                         <img
@@ -640,13 +638,13 @@ export default function ChatInterface() {
                       <p>{message.content}</p>
                     )}
                   </div>
-                  <div className="flex items-center justify-between mt-1">
-                    <span className="text-xs opacity-70">
+                  <div className="flex items-center justify-end mt-1">
+                      <span className="text-[10px] opacity-70">
                       {formatTime(message.timestamp)}
                     </span>
                     <div className="flex items-center space-x-1">
                       {message.isEdited && (
-                        <span className="text-xs opacity-70">edited</span>
+                          <span className="text-[10px] opacity-70">edited</span>
                       )}
                       {message.sender === "me" && (
                         <CheckCheck className="h-3 w-3 opacity-70" />
@@ -727,8 +725,8 @@ export default function ChatInterface() {
       </div>
 
       {/* Message Input - Sticky at bottom */}
-      <div className="p-4 border-t border-border/50 bg-background">
-        <div className="flex items-center space-x-2">
+      <div className="p-1.5 md:p-4 border-t border-border/50 bg-background">
+        <div className="flex items-center space-x-1 md:space-x-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm">
@@ -795,7 +793,7 @@ export default function ChatInterface() {
               }
             }}
             placeholder="Type a message..."
-            className="flex-1"
+            className="flex-1 text-xs md:text-sm"
           />
 
           <Button onClick={handleSendMessage} disabled={!newMessage.trim()}>
