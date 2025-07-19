@@ -3,11 +3,22 @@ import { Link, useLocation } from "react-router-dom";
 import { MessageCircle, Video, Users, Bell, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 export default function BottomNavigation() {
   const location = useLocation();
   const isGroupChat = /^\/home\/groups\/chat\/[^/]+$/.test(location.pathname);
   const userType = localStorage.getItem("userType");
+  const [chatPopoverOpen, setChatPopoverOpen] = React.useState(false);
+
+  const handleChatOption = (type: "text" | "video") => {
+    setChatPopoverOpen(false);
+    if (type === "text") {
+      window.location.href = "/home/stranger-chat";
+    } else {
+      window.location.href = "/home/video-call";
+    }
+  };
 
   const allNavItems = [
     { href: "/home", label: "Home", icon: MessageCircle },
@@ -16,12 +27,7 @@ export default function BottomNavigation() {
       label: "Chat",
       icon: MessageCircle,
       guestAllowed: true,
-    },
-    {
-      href: "/home/video-call",
-      label: "Video",
-      icon: Video,
-      guestAllowed: true,
+      isChatCombo: true,
     },
     {
       href: "/home/chats",
@@ -60,6 +66,52 @@ export default function BottomNavigation() {
               const isActive =
                 location.pathname === item.href ||
                 (item.href === "/home" && location.pathname === "/home");
+
+              if (item.isChatCombo) {
+                return (
+                  <Popover key={item.href} open={chatPopoverOpen} onOpenChange={setChatPopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <div className="flex flex-col items-center space-y-1 p-2 rounded-lg hover:bg-muted/50 transition-colors relative cursor-pointer">
+                        <div className="relative">
+                          <Icon
+                            className={cn(
+                              "h-6 w-6 transition-colors",
+                              isActive
+                                ? "text-primary"
+                                : "text-muted-foreground hover:text-foreground",
+                            )}
+                          />
+                        </div>
+                        <span
+                          className={cn(
+                            "text-xs font-medium transition-colors",
+                            isActive ? "text-primary" : "text-muted-foreground",
+                          )}
+                        >
+                          {item.label}
+                        </span>
+                        {isActive && (
+                          <div className="w-1 h-1 bg-primary rounded-full" />
+                        )}
+                      </div>
+                    </PopoverTrigger>
+                    <PopoverContent align="center" className="w-40 p-2">
+                      <button
+                        className="w-full px-3 py-2 rounded hover:bg-muted/50 text-left text-sm"
+                        onClick={() => handleChatOption("text")}
+                      >
+                        Text Chat
+                      </button>
+                      <button
+                        className="w-full px-3 py-2 rounded hover:bg-muted/50 text-left text-sm mt-1"
+                        onClick={() => handleChatOption("video")}
+                      >
+                        Video Chat
+                      </button>
+                    </PopoverContent>
+                  </Popover>
+                );
+              }
 
               return (
                 <Link key={item.href} to={item.href}>
