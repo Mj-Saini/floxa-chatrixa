@@ -1,12 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Badge } from './ui/badge';
-import { Loader2, MessageCircle, Users, X, Star } from 'lucide-react';
-import { toast } from 'sonner';
-import { io } from "socket.io-client";
+import React, { useState, useRef, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { Send, X, Search, Users, MessageCircle, Clock, User } from 'lucide-react';
 
 interface StrangerChatProps {
     onClose: () => void;
@@ -36,6 +37,7 @@ interface StrangerChat {
 
 const StrangerChat: React.FC<StrangerChatProps> = ({ onClose }) => {
     const { user } = useAuth();
+    const { toast } = useToast();
     const [isSearching, setIsSearching] = useState(false);
     const [currentChat, setCurrentChat] = useState<StrangerChat | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
@@ -43,89 +45,87 @@ const StrangerChat: React.FC<StrangerChatProps> = ({ onClose }) => {
     const [queuePosition, setQueuePosition] = useState<number | null>(null);
     const [estimatedWaitTime, setEstimatedWaitTime] = useState<number | null>(null);
     const [preferences, setPreferences] = useState({
-        language: 'en',
-        ageRange: { min: 18, max: 99 },
-        gender: 'any' as 'male' | 'female' | 'any',
-        interests: [] as string[]
+        gender: 'any',
+        ageRange: '18-25',
+        interests: []
     });
 
-    const socketRef = useRef<any>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const searchTimeout = useRef<NodeJS.Timeout | null>(null);
     const queuePollInterval = useRef<NodeJS.Timeout | null>(null);
-    const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
+
+    // Mock stranger data
+    const mockStrangers = [
+        {
+            _id: 'stranger_1',
+            username: 'Alex',
+            firstName: 'Alex',
+            lastName: 'Smith',
+            avatar: '',
+            isOnline: true
+        },
+        {
+            _id: 'stranger_2',
+            username: 'Sarah',
+            firstName: 'Sarah',
+            lastName: 'Johnson',
+            avatar: '',
+            isOnline: true
+        },
+        {
+            _id: 'stranger_3',
+            username: 'Mike',
+            firstName: 'Mike',
+            lastName: 'Davis',
+            avatar: '',
+            isOnline: true
+        }
+    ];
 
     useEffect(() => {
-        // Import io from socket.io-client if not already imported
-        //  // <-- Make sure this is at the top of your file
-
-        // Initialize Socket.IO connection
-        if (!socketRef.current) {
-            socketRef.current = (window as any).io
-                ? (window as any).io("http://localhost:3001", { transports: ["websocket"] })
-                : require("socket.io-client").io("http://localhost:3001", { transports: ["websocket"] });
-        }
-
-        socketRef.current.on("connect", () => {
-            console.log("Socket.IO connected");
-        });
-
-        socketRef.current.on("match-found", (data) => {
-            handleSocketMessage({ type: "match-found", ...data });
-        });
-        socketRef.current.on("stranger-message-received", (data) => {
-            handleSocketMessage({ type: "stranger-message-received", ...data });
-        });
-        socketRef.current.on("stranger-chat-ended", (data) => {
-            handleSocketMessage({ type: "stranger-chat-ended", ...data });
-        });
-        socketRef.current.on("queue-update", (data) => {
-            handleSocketMessage({ type: "queue-update", ...data });
-        });
-        socketRef.current.on("error", (error) => {
-            console.error("Socket.IO error:", error);
-        });
-
         return () => {
-            if (socketRef.current) {
-                socketRef.current.disconnect();
+            if (searchTimeout.current) {
+                clearTimeout(searchTimeout.current);
             }
             if (queuePollInterval.current) {
                 clearInterval(queuePollInterval.current);
             }
-            if (searchTimeout) {
-                clearTimeout(searchTimeout);
-            }
         };
     }, []);
 
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
     const handleSocketMessage = (data: any) => {
-        switch (data.type) {
-            case 'match-found':
-                setIsSearching(false);
-                setCurrentChat(data.chat);
-                setMessages(data.chat.messages || []);
-                setQueuePosition(null);
-                setEstimatedWaitTime(null);
-                if (queuePollInterval.current) {
-                    clearInterval(queuePollInterval.current);
-                }
-                if (searchTimeout) {
-                    clearTimeout(searchTimeout);
-                    setSearchTimeout(null);
-                }
-                toast.success('Match found! You are now connected with a stranger.');
-                break;
-            case 'stranger-message-received':
-                setMessages(prev => [...prev, data]);
-                break;
-            case 'stranger-chat-ended':
-                toast.info('Your stranger chat partner has ended the conversation.');
-                handleEndChat();
-                break;
-            case 'queue-update':
-                setQueuePosition(data.position);
-                setEstimatedWaitTime(data.estimatedWaitTime);
-                break;
+        // Mock socket message handling
+        if (data.type === 'match_found') {
+            setIsSearching(false);
+            const mockChat: StrangerChat = {
+                _id: `chat_${Date.now()}`,
+                participants: [
+                    {
+                        user: {
+                            _id: user?._id || '',
+                            username: user?.username || '',
+                            firstName: user?.firstName,
+                            lastName: user?.lastName,
+                            avatar: user?.avatar
+                        }
+                    },
+                    {
+                        user: mockStrangers[Math.floor(Math.random() * mockStrangers.length)]
+                    }
+                ],
+                messages: [],
+                status: 'active',
+                startedAt: new Date()
+            };
+            setCurrentChat(mockChat);
+            toast({
+                title: "Match found!",
+                description: "You are now connected with a stranger.",
+            });
         }
     };
 
@@ -137,61 +137,55 @@ const StrangerChat: React.FC<StrangerChatProps> = ({ onClose }) => {
             setCurrentChat(null);
             setMessages([]);
 
-            // Join queue via API
-            const response = await fetch('/api/stranger/join', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify(preferences)
-            });
+            // Mock queue position
+            setQueuePosition(Math.floor(Math.random() * 10) + 1);
+            setEstimatedWaitTime(Math.floor(Math.random() * 30) + 10);
 
-            const data = await response.json();
-
-            if (data.matchFound && data.chat) {
-                setIsSearching(false);
-                setCurrentChat(data.chat);
-                setMessages(data.chat.messages || []);
-                toast.success('Match found! You are now connected with a stranger.');
-            } else {
-                // Join Socket.IO queue
-                if (socketRef.current && socketRef.current.connected) {
-                    socketRef.current.emit('join-stranger-queue', {
-                        userId: user?._id,
-                        preferences
+            // Simulate finding a match after a random delay
+            const matchDelay = Math.random() * 10000 + 5000; // 5-15 seconds
+            searchTimeout.current = setTimeout(() => {
+                if (isSearching && !currentChat) {
+                    // Simulate match found
+                    const mockChat: StrangerChat = {
+                        _id: `chat_${Date.now()}`,
+                        participants: [
+                            {
+                                user: {
+                                    _id: user?._id || '',
+                                    username: user?.username || '',
+                                    firstName: user?.firstName,
+                                    lastName: user?.lastName,
+                                    avatar: user?.avatar
+                                }
+                            },
+                            {
+                                user: mockStrangers[Math.floor(Math.random() * mockStrangers.length)]
+                            }
+                        ],
+                        messages: [],
+                        status: 'active',
+                        startedAt: new Date()
+                    };
+                    setCurrentChat(mockChat);
+                    setIsSearching(false);
+                    setQueuePosition(null);
+                    setEstimatedWaitTime(null);
+                    toast({
+                        title: "Match found!",
+                        description: "You are now connected with a stranger.",
                     });
                 }
+            }, matchDelay);
 
-                // Start polling for queue status
-                startQueuePolling();
-
-                // Set a timeout for searching (e.g., 30 seconds)
-                const timeout = setTimeout(() => {
-                    if (isSearching && !currentChat) {
-                        setIsSearching(false);
-                        if (queuePollInterval.current) {
-                            clearInterval(queuePollInterval.current);
-                            queuePollInterval.current = null;
-                        }
-                        toast.info('No one is available right now. Please try again later.');
-                    }
-                }, 30000); // 30 seconds
-                setSearchTimeout(timeout);
-            }
         } catch (error) {
             console.error('Error starting search:', error);
-            toast.error('Failed to start searching');
+            toast({
+                title: "Error",
+                description: "Failed to start searching",
+                variant: "destructive",
+            });
             setIsSearching(false);
         }
-    };
-
-    const startQueuePolling = () => {
-        // Poll immediately
-        pollQueueStatus();
-
-        // Then poll every 5 seconds
-        queuePollInterval.current = setInterval(pollQueueStatus, 5000);
     };
 
     const stopSearching = async () => {
@@ -199,62 +193,17 @@ const StrangerChat: React.FC<StrangerChatProps> = ({ onClose }) => {
             setIsSearching(false);
             setQueuePosition(null);
             setEstimatedWaitTime(null);
-            if (searchTimeout) {
-                clearTimeout(searchTimeout);
-                setSearchTimeout(null);
+            if (searchTimeout.current) {
+                clearTimeout(searchTimeout.current);
+                searchTimeout.current = null;
             }
 
-            // Leave queue via API
-            await fetch('/api/stranger/leave', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
+            toast({
+                title: "Search stopped",
+                description: "Stopped searching for strangers",
             });
-
-            // Leave Socket.IO queue
-            if (socketRef.current && socketRef.current.connected) {
-                socketRef.current.emit('leave-stranger-queue', {
-                    userId: user?._id
-                });
-            }
-
-            // Stop polling
-            if (queuePollInterval.current) {
-                clearInterval(queuePollInterval.current);
-                queuePollInterval.current = null;
-            }
-
-            toast.info('Stopped searching for strangers');
         } catch (error) {
             console.error('Error stopping search:', error);
-        }
-    };
-
-    const pollQueueStatus = async () => {
-        if (!isSearching) return;
-
-        try {
-            const response = await fetch('/api/stranger/queue-status', {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                setQueuePosition(data.position);
-                setEstimatedWaitTime(data.estimatedWaitTime);
-            } else if (response.status === 404) {
-                // User is no longer in queue (probably matched)
-                setIsSearching(false);
-                if (queuePollInterval.current) {
-                    clearInterval(queuePollInterval.current);
-                    queuePollInterval.current = null;
-                }
-            }
-        } catch (error) {
-            console.error('Error polling queue status:', error);
         }
     };
 
@@ -262,29 +211,6 @@ const StrangerChat: React.FC<StrangerChatProps> = ({ onClose }) => {
         if (!newMessage.trim() || !currentChat) return;
 
         try {
-            const messageData = {
-                content: newMessage,
-                chatId: currentChat._id
-            };
-
-            // Send via API
-            await fetch('/api/stranger/message', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify(messageData)
-            });
-
-            // Send via Socket.IO
-            if (socketRef.current && socketRef.current.connected) {
-                socketRef.current.emit('stranger-message', {
-                    userId: user?._id,
-                    ...messageData
-                });
-            }
-
             // Add message locally
             const newMsg: Message = {
                 content: newMessage,
@@ -294,31 +220,51 @@ const StrangerChat: React.FC<StrangerChatProps> = ({ onClose }) => {
 
             setMessages(prev => [...prev, newMsg]);
             setNewMessage('');
+
+            // Simulate stranger response after a delay
+            setTimeout(() => {
+                const strangerResponse: Message = {
+                    content: getRandomResponse(),
+                    sender: currentChat.participants[1].user._id,
+                    timestamp: new Date()
+                };
+                setMessages(prev => [...prev, strangerResponse]);
+            }, 1000 + Math.random() * 2000); // 1-3 second delay
+
         } catch (error) {
             console.error('Error sending message:', error);
-            toast.error('Failed to send message');
+            toast({
+                title: "Error",
+                description: "Failed to send message",
+                variant: "destructive",
+            });
         }
+    };
+
+    const getRandomResponse = (): string => {
+        const responses = [
+            "That's interesting! Tell me more.",
+            "I can relate to that.",
+            "What do you think about that?",
+            "That's cool!",
+            "I see what you mean.",
+            "That's a good point.",
+            "Interesting perspective!",
+            "I agree with you.",
+            "That makes sense.",
+            "What else is on your mind?"
+        ];
+        return responses[Math.floor(Math.random() * responses.length)];
     };
 
     const handleEndChat = async () => {
         try {
-            if (currentChat) {
-                await fetch('/api/stranger/end', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    },
-                    body: JSON.stringify({
-                        rating: 5,
-                        reportReason: ''
-                    })
-                });
-            }
-
             setCurrentChat(null);
             setMessages([]);
-            toast.info('Stranger chat ended');
+            toast({
+                title: "Chat ended",
+                description: "Stranger chat ended",
+            });
         } catch (error) {
             console.error('Error ending chat:', error);
         }
@@ -328,171 +274,166 @@ const StrangerChat: React.FC<StrangerChatProps> = ({ onClose }) => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
-
-    useEffect(() => {
-        return () => {
-            if (searchTimeout) {
-                clearTimeout(searchTimeout);
-            }
-        };
-    }, [searchTimeout]);
-
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <Card className="w-full max-w-2xl h-[80vh] flex flex-col">
-                <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
-                        <Users className="h-5 w-5" />
-                        Stranger Chat
-                    </CardTitle>
-                    <Button variant="ghost" size="sm" onClick={onClose}>
-                        <X className="h-4 w-4" />
-                    </Button>
-                </CardHeader>
+            <div className="bg-background rounded-lg shadow-lg w-full max-w-4xl h-[80vh] flex flex-col">
+                {/* Header */}
+                <div className="flex items-center justify-between p-4 border-b">
+                    <div className="flex items-center space-x-3">
+                        <Button variant="ghost" size="sm" onClick={onClose}>
+                            <X className="h-5 w-5" />
+                        </Button>
+                        <div>
+                            <h2 className="font-semibold">Stranger Chat</h2>
+                            <p className="text-sm text-muted-foreground">
+                                Connect with random people
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
-                <CardContent className="flex-1 flex flex-col">
+                {/* Content */}
+                <div className="flex-1 flex">
                     {!currentChat && !isSearching && (
-                        <div className="flex-1 flex flex-col items-center justify-center gap-4">
-                            <div className="text-center">
-                                <h3 className="text-lg font-semibold mb-2">Connect with Strangers</h3>
-                                <p className="text-muted-foreground mb-4">
-                                    Start a random conversation with someone from around the world
-                                </p>
-                            </div>
-
-                            <div className="w-full max-w-md space-y-4">
-                                <div>
-                                    <label className="text-sm font-medium">Gender Preference</label>
-                                    <select
-                                        value={preferences.gender}
-                                        onChange={(e) => setPreferences(prev => ({ ...prev, gender: e.target.value as any }))}
-                                        className="w-full mt-1 p-2 border rounded-md"
-                                    >
-                                        <option value="any">Any</option>
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label className="text-sm font-medium">Age Range</label>
-                                    <div className="flex gap-2 mt-1">
-                                        <Input
-                                            type="number"
-                                            placeholder="Min"
-                                            value={preferences.ageRange.min}
-                                            onChange={(e) => setPreferences(prev => ({
-                                                ...prev,
-                                                ageRange: { ...prev.ageRange, min: parseInt(e.target.value) }
-                                            }))}
-                                        />
-                                        <Input
-                                            type="number"
-                                            placeholder="Max"
-                                            value={preferences.ageRange.max}
-                                            onChange={(e) => setPreferences(prev => ({
-                                                ...prev,
-                                                ageRange: { ...prev.ageRange, max: parseInt(e.target.value) }
-                                            }))}
-                                        />
+                        <div className="flex-1 p-6">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center space-x-2">
+                                        <Users className="h-5 w-5" />
+                                        <span>Find a Stranger</span>
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <div>
+                                        <label className="text-sm font-medium">Gender Preference</label>
+                                        <select
+                                            className="w-full mt-1 p-2 border rounded-md"
+                                            value={preferences.gender}
+                                            onChange={(e) => setPreferences(prev => ({ ...prev, gender: e.target.value }))}
+                                        >
+                                            <option value="any">Any</option>
+                                            <option value="male">Male</option>
+                                            <option value="female">Female</option>
+                                        </select>
                                     </div>
-                                </div>
-
-                                <Button onClick={startSearching} className="w-full">
-                                    <MessageCircle className="h-4 w-4 mr-2" />
-                                    Start Searching
-                                </Button>
-                            </div>
+                                    <div>
+                                        <label className="text-sm font-medium">Age Range</label>
+                                        <select
+                                            className="w-full mt-1 p-2 border rounded-md"
+                                            value={preferences.ageRange}
+                                            onChange={(e) => setPreferences(prev => ({ ...prev, ageRange: e.target.value }))}
+                                        >
+                                            <option value="18-25">18-25</option>
+                                            <option value="26-35">26-35</option>
+                                            <option value="36-45">36-45</option>
+                                            <option value="46+">46+</option>
+                                        </select>
+                                    </div>
+                                    <Button
+                                        onClick={startSearching}
+                                        className="w-full"
+                                        disabled={isSearching}
+                                    >
+                                        <Search className="h-4 w-4 mr-2" />
+                                        Start Searching
+                                    </Button>
+                                </CardContent>
+                            </Card>
                         </div>
                     )}
 
                     {isSearching && (
-                        <div className="flex-1 flex flex-col items-center justify-center gap-4">
-                            <Loader2 className="h-8 w-8 animate-spin" />
-                            <div className="text-center">
-                                <h3 className="text-lg font-semibold mb-2">Searching for Strangers...</h3>
-                                {queuePosition && (
-                                    <p className="text-muted-foreground">
-                                        Position in queue: {queuePosition}
-                                    </p>
-                                )}
-                                {estimatedWaitTime && (
-                                    <p className="text-muted-foreground">
-                                        Estimated wait time: {Math.ceil(estimatedWaitTime / 60)} minutes
-                                    </p>
-                                )}
-                                <p className="text-sm text-muted-foreground mt-2">
-                                    We're looking for someone who matches your preferences...
-                                </p>
-                            </div>
-                            <Button variant="outline" onClick={stopSearching}>
-                                Stop Searching
-                            </Button>
+                        <div className="flex-1 p-6 flex items-center justify-center">
+                            <Card className="w-full max-w-md">
+                                <CardContent className="p-6 text-center space-y-4">
+                                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                                    <div>
+                                        <h3 className="font-semibold">Searching for strangers...</h3>
+                                        {queuePosition && (
+                                            <p className="text-sm text-muted-foreground mt-2">
+                                                Position in queue: {queuePosition}
+                                            </p>
+                                        )}
+                                        {estimatedWaitTime && (
+                                            <p className="text-sm text-muted-foreground">
+                                                Estimated wait: {estimatedWaitTime} seconds
+                                            </p>
+                                        )}
+                                    </div>
+                                    <Button
+                                        variant="outline"
+                                        onClick={stopSearching}
+                                        className="w-full"
+                                    >
+                                        Stop Searching
+                                    </Button>
+                                </CardContent>
+                            </Card>
                         </div>
                     )}
 
                     {currentChat && (
                         <div className="flex-1 flex flex-col">
-                            <div className="flex items-center justify-between mb-4 p-2 bg-muted rounded-md">
-                                <div className="flex items-center gap-2">
-                                    <Badge variant="secondary">Active</Badge>
-                                    <span className="text-sm text-muted-foreground">
-                                        Connected with a stranger
-                                    </span>
+                            {/* Chat Header */}
+                            <div className="flex items-center justify-between p-4 border-b">
+                                <div className="flex items-center space-x-3">
+                                    <Avatar className="h-8 w-8">
+                                        <AvatarImage src={currentChat.participants[1].user.avatar} />
+                                        <AvatarFallback>
+                                            {currentChat.participants[1].user.firstName?.[0] || currentChat.participants[1].user.username[0]}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <p className="font-medium">{currentChat.participants[1].user.firstName || currentChat.participants[1].user.username}</p>
+                                        <p className="text-sm text-muted-foreground">Stranger</p>
+                                    </div>
                                 </div>
                                 <Button variant="outline" size="sm" onClick={handleEndChat}>
                                     End Chat
                                 </Button>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto space-y-2 mb-4">
-                                {messages.length === 0 ? (
-                                    <div className="text-center text-muted-foreground py-8">
-                                        <MessageCircle className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                                        <p>Start the conversation!</p>
-                                    </div>
-                                ) : (
-                                    messages.map((message, index) => (
+                            {/* Messages */}
+                            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                                {messages.map((message, index) => (
+                                    <div
+                                        key={index}
+                                        className={`flex ${message.sender === user?._id ? 'justify-end' : 'justify-start'}`}
+                                    >
                                         <div
-                                            key={index}
-                                            className={`flex ${message.sender === user?._id ? 'justify-end' : 'justify-start'}`}
-                                        >
-                                            <div
-                                                className={`max-w-xs p-3 rounded-lg ${message.sender === user?._id
+                                            className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${message.sender === user?._id
                                                     ? 'bg-primary text-primary-foreground'
                                                     : 'bg-muted'
-                                                    }`}
-                                            >
-                                                <p className="text-sm">{message.content}</p>
-                                                <p className="text-[10px] opacity-70 mt-1">
-                                                    {new Date(message.timestamp).toLocaleTimeString()}
-                                                </p>
-                                            </div>
+                                                }`}
+                                        >
+                                            <p className="text-sm">{message.content}</p>
+                                            <p className="text-xs opacity-70 mt-1">
+                                                {message.timestamp.toLocaleTimeString()}
+                                            </p>
                                         </div>
-                                    ))
-                                )}
+                                    </div>
+                                ))}
                                 <div ref={messagesEndRef} />
                             </div>
 
-                            <div className="flex gap-2">
-                                <Input
-                                    value={newMessage}
-                                    onChange={(e) => setNewMessage(e.target.value)}
-                                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                                    placeholder="Type your message..."
-                                    className="flex-1"
-                                />
-                                <Button onClick={sendMessage} disabled={!newMessage.trim()}>
-                                    Send
-                                </Button>
+                            {/* Message Input */}
+                            <div className="p-4 border-t">
+                                <div className="flex space-x-2">
+                                    <Input
+                                        value={newMessage}
+                                        onChange={(e) => setNewMessage(e.target.value)}
+                                        placeholder="Type a message..."
+                                        onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                                    />
+                                    <Button onClick={sendMessage} disabled={!newMessage.trim()}>
+                                        <Send className="h-4 w-4" />
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     )}
-                </CardContent>
-            </Card>
+                </div>
+            </div>
         </div>
     );
 };

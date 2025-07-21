@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+// There are no backend API calls in this file, so nothing to remove here.
 
 export interface User {
     _id: string;
@@ -49,12 +50,32 @@ interface AuthProviderProps {
     children: ReactNode;
 }
 
+// Mock user data storage
+const MOCK_USERS_KEY = 'mock_users';
+const MOCK_TOKENS_KEY = 'mock_tokens';
+
+const getMockUsers = (): Record<string, User> => {
+    const stored = localStorage.getItem(MOCK_USERS_KEY);
+    return stored ? JSON.parse(stored) : {};
+};
+
+const saveMockUsers = (users: Record<string, User>) => {
+    localStorage.setItem(MOCK_USERS_KEY, JSON.stringify(users));
+};
+
+const getMockTokens = (): Record<string, string> => {
+    const stored = localStorage.getItem(MOCK_TOKENS_KEY);
+    return stored ? JSON.parse(stored) : {};
+};
+
+const saveMockTokens = (tokens: Record<string, string>) => {
+    localStorage.setItem(MOCK_TOKENS_KEY, JSON.stringify(tokens));
+};
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-
-    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
     // Check for existing token on app load
     useEffect(() => {
@@ -69,16 +90,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const fetchUserProfile = async (authToken: string) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/me`, {
-                headers: {
-                    'Authorization': `Bearer ${authToken}`,
-                    'Content-Type': 'application/json',
-                },
-            });
+            // Mock implementation - get user from token
+            const tokens = getMockTokens();
+            const userId = Object.keys(tokens).find(key => tokens[key] === authToken);
 
-            if (response.ok) {
-                const userData = await response.json();
-                setUser(userData);
+            if (userId) {
+                const users = getMockUsers();
+                const userData = users[userId];
+                if (userData) {
+                    setUser(userData);
+                } else {
+                    // Token is invalid, clear it
+                    localStorage.removeItem('authToken');
+                    setToken(null);
+                    setUser(null);
+                }
             } else {
                 // Token is invalid, clear it
                 localStorage.removeItem('authToken');
@@ -97,26 +123,41 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const login = async (email: string, password: string) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password }),
-            });
+            // Mock implementation
+            const users = getMockUsers();
+            let user = Object.values(users).find(u => u.email === email);
 
-            const data = await response.json();
+            // If no user exists, create a mock user for demo purposes
+            if (!user) {
+                const newUser: User = {
+                    _id: `user_${Date.now()}`,
+                    username: email.split('@')[0], // Use email prefix as username
+                    email: email,
+                    firstName: 'Demo',
+                    lastName: 'User',
+                    avatar: '',
+                    isOnline: true,
+                    lastSeen: new Date().toISOString(),
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                };
 
-            if (!response.ok) {
-                throw new Error(data.message || 'Login failed');
+                users[newUser._id] = newUser;
+                saveMockUsers(users);
+                user = newUser;
             }
 
-            setToken(data.token);
-            setUser(data.user);
-            localStorage.setItem('authToken', data.token);
-            localStorage.setItem('userId', data.user._id); // <-- Add this
-            localStorage.setItem('userType', 'registered'); // <-- Add this
-            localStorage.removeItem('guestId'); // <-- Remove guestId if present
+            const mockToken = `mock_token_${Date.now()}`;
+            const tokens = getMockTokens();
+            tokens[user._id] = mockToken;
+            saveMockTokens(tokens);
+
+            setToken(mockToken);
+            setUser(user);
+            localStorage.setItem('authToken', mockToken);
+            localStorage.setItem('userId', user._id);
+            localStorage.setItem('userType', 'registered');
+            localStorage.removeItem('guestId');
         } catch (error) {
             console.error('Login error:', error);
             throw error;
@@ -125,27 +166,45 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const register = async (userData: RegisterData) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/register`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(userData),
-            });
+            // Mock implementation
+            const users = getMockUsers();
 
-            const data = await response.json();
+            // Check if user already exists
+            const existingUser = Object.values(users).find(u =>
+                u.email === userData.email || u.username === userData.username
+            );
 
-            if (!response.ok) {
-                const errorMessage = data.errors ? data.errors.join(', ') : data.message || 'Registration failed';
-                throw new Error(errorMessage);
+            if (existingUser) {
+                throw new Error('User already exists');
             }
 
-            setToken(data.token);
-            setUser(data.user);
-            localStorage.setItem('authToken', data.token);
-            localStorage.setItem('userId', data.user._id); // <-- Add this
-            localStorage.setItem('userType', 'registered'); // <-- Add this
-            localStorage.removeItem('guestId'); // <-- Remove guestId if present
+            const newUser: User = {
+                _id: `user_${Date.now()}`,
+                username: userData.username,
+                email: userData.email,
+                firstName: userData.firstName,
+                lastName: userData.lastName,
+                avatar: '',
+                isOnline: true,
+                lastSeen: new Date().toISOString(),
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+            };
+
+            users[newUser._id] = newUser;
+            saveMockUsers(users);
+
+            const mockToken = `mock_token_${Date.now()}`;
+            const tokens = getMockTokens();
+            tokens[newUser._id] = mockToken;
+            saveMockTokens(tokens);
+
+            setToken(mockToken);
+            setUser(newUser);
+            localStorage.setItem('authToken', mockToken);
+            localStorage.setItem('userId', newUser._id);
+            localStorage.setItem('userType', 'registered');
+            localStorage.removeItem('guestId');
         } catch (error) {
             console.error('Registration error:', error);
             throw error;
@@ -154,42 +213,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const logout = async () => {
         try {
-            if (token) {
-                await fetch(`${API_BASE_URL}/auth/logout`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                });
-            }
-        } catch (error) {
-            console.error('Logout error:', error);
-        } finally {
+            // Mock implementation - no server call needed
             setToken(null);
             setUser(null);
             localStorage.removeItem('authToken');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userType');
+        } catch (error) {
+            console.error('Logout error:', error);
         }
     };
 
     const updateProfile = async (profileData: Partial<User>) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/profile`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(profileData),
-            });
+            // Mock implementation
+            if (!user) throw new Error('No user logged in');
 
-            const data = await response.json();
+            const users = getMockUsers();
+            const updatedUser = { ...user, ...profileData, updatedAt: new Date().toISOString() };
+            users[user._id] = updatedUser;
+            saveMockUsers(users);
 
-            if (!response.ok) {
-                throw new Error(data.message || 'Profile update failed');
-            }
-
-            setUser(data.user);
+            setUser(updatedUser);
         } catch (error) {
             console.error('Profile update error:', error);
             throw error;
@@ -198,9 +243,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const checkUsername = async (username: string): Promise<boolean> => {
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/check-username/${username}`);
-            const data = await response.json();
-            return data.available;
+            // Mock implementation
+            const users = getMockUsers();
+            const existingUser = Object.values(users).find(u => u.username === username);
+            return !existingUser; // Available if no user found
         } catch (error) {
             console.error('Username check error:', error);
             return false;

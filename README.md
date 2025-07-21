@@ -1,78 +1,114 @@
-# Chatrixa - Simplified Structure
+# Floxa Chatrixa - Frontend
+
+A modern chat application built with React, TypeScript, and Tailwind CSS.
 
 ## Project Structure
 
 ```
 floxa-chatrixa/
-├── backend/           # Backend API (Node.js + Express + MongoDB)
-│   ├── models/       # Database models
-│   ├── routes/       # API routes
-│   ├── middleware/   # Authentication middleware
-│   ├── index.js      # Main server file
-│   └── package.json  # Backend dependencies
 ├── client/           # Frontend (React + TypeScript)
 │   ├── components/   # React components
 │   ├── pages/        # Page components
 │   ├── contexts/     # React contexts
-│   └── package.json  # Frontend dependencies
+│   ├── hooks/        # Custom React hooks
+│   ├── lib/          # Utility functions
+│   └── ui/           # UI components
+├── public/           # Static assets
 └── README.md         # This file
 ```
 
 ## Quick Start
 
-### 1. Start Backend
+### Install Dependencies
 ```bash
-cd backend
 npm install
+```
+
+### Start Development Server
+```bash
 npm run dev
 ```
-Backend will run on: `http://localhost:5000`
+Frontend will run on: `http://localhost:3000`
 
-### 2. Start Frontend
+### Build for Production
 ```bash
-cd client
-npm install
-npm run dev
+npm run build
 ```
-Frontend will run on: `http://localhost:8081`
 
-## API Endpoints
-
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login user
-- `GET /api/auth/me` - Get current user profile
-- `PUT /api/auth/profile` - Update user profile
-- `POST /api/auth/logout` - Logout user
+### Preview Production Build
+```bash
+npm run preview
+```
 
 ## Features
 
-- ✅ User registration and login
-- ✅ JWT authentication
-- ✅ Profile management
-- ✅ MongoDB database
-- ✅ Real-time user state
-- ✅ Protected routes
-- ✅ Modern UI with Tailwind CSS
+- ✅ Modern React with TypeScript
+- ✅ Beautiful UI with Tailwind CSS
+- ✅ Responsive design
+- ✅ Component-based architecture
+- ✅ React Router for navigation
+- ✅ Context API for state management
+- ✅ Custom hooks for reusability
+- ✅ UI components with Radix UI
 
-## Environment Setup
+## Pages
 
-### Backend (.env)
-```
-MONGODB_URI=mongodb://localhost:27017/chatrixa
-JWT_SECRET=your-super-secret-jwt-key
-PORT=5000
-NODE_ENV=development
-```
+- **Home** - Landing page
+- **Login** - User authentication
+- **Chats** - Chat interface
+- **Profile** - User profile management
+- **Settings** - Application settings
+- **Groups** - Group chat management
+- **Stranger Chat** - Anonymous chat feature
+- **Video Call** - Video calling interface
+- **Wallet** - Digital wallet functionality
+- **Community** - Community features
+- **Help & Support** - Help pages
 
-### Frontend (.env)
-```
-VITE_API_URL=http://localhost:5000/api
-```
+## Tech Stack
 
-## Database
+- **React 18** - UI library
+- **TypeScript** - Type safety
+- **Vite** - Build tool and dev server
+- **Tailwind CSS** - Utility-first CSS framework
+- **Radix UI** - Accessible UI components
+- **React Router** - Client-side routing
+- **Lucide React** - Icon library
+- **Framer Motion** - Animation library
 
-Make sure MongoDB is running:
-```bash
-# Install MongoDB locally or use Docker
-docker run -d -p 27017:27017 --name mongodb mongo:latest
-``` 
+## Development
+
+### Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run test` - Run tests
+- `npm run typecheck` - Type checking
+- `npm run format.fix` - Format code with Prettier
+
+### Code Structure
+
+- **Components**: Reusable UI components in `client/components/`
+- **Pages**: Page-level components in `client/pages/`
+- **Contexts**: React contexts for state management in `client/contexts/`
+- **Hooks**: Custom React hooks in `client/hooks/`
+- **Utils**: Utility functions in `client/lib/`
+- **UI Components**: Radix UI components in `client/components/ui/`
+
+## Deployment
+
+This is a frontend-only application. You can deploy it to any static hosting service:
+
+- **Vercel** - Zero-config deployment
+- **Netlify** - Static site hosting
+- **GitHub Pages** - Free hosting for GitHub repositories
+- **Firebase Hosting** - Google's hosting service
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and type checking
+5. Submit a pull request 

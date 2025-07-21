@@ -67,6 +67,33 @@ export default function StrangerChat() {
   const isConnectingRef = useRef(isConnecting);
   const waitingRef = useRef(waiting);
 
+  // Fetch dynamic stranger chat text on mount
+  useEffect(() => {
+    fetch("https://chatapp-zssm.onrender.com/api/stranger-text")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.text) {
+          setMessages([
+            {
+              id: "system-intro-" + Date.now(),
+              content: data.text,
+              sender: "me",
+              timestamp: new Date(),
+              type: "system",
+            },
+          ]);
+        }
+      })
+      .catch((err) => {
+        toast({
+          title: "Error",
+          description: "Failed to load stranger chat intro text.",
+          variant: "destructive",
+        });
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     isConnectingRef.current = isConnecting;
   }, [isConnecting]);
@@ -614,7 +641,7 @@ export default function StrangerChat() {
                                 <p>{message.content}</p>
                               )}
                             </div>
-                              <p className="text-[10px] opacity-70 mt-1">
+                            <p className="text-[10px] opacity-70 mt-1">
                               {formatTime(message.timestamp)}
                             </p>
                           </div>
