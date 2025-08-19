@@ -1,27 +1,42 @@
-// server.js
-import express from 'express';
-import dotenv from 'dotenv';
-import cors from 'cors';
-import connectDB from './config/db.js';
+// socket/socketHandler.js
+const waitingQueue = [];
 
-// Load env variables
-dotenv.config();
+export const handleSocketConnection = (socket, io) => {
+  console.log(`🟢 User connected: ${socket.id}`);
 
-// Connect DB
-connectDB();
+  socket.on('find_stranger', () => {
+    console.log(`🔍 ${socket.id} is looking for a stranger`);
 
-// Create app
-const app = express();
-app.use(cors());
-app.use(express.json());
+    if (waitingQueue.length > 0) {
+      const strangerId = waitingQueue.shift(); // get waiting user
+      const roomId = `${socket.id}#${strangerId}`;
 
-// Dummy route
-app.get('/', (req, res) => {
-  res.send('API is running...');
-});
+      // Join both users to the same room
+      socket.join(roomId);
+      io.to(strangerId).socketsJoin(roomId);
 
-// Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server started on port ${PORT}`);
-});
+      // Notify both users
+      io.to(roomId).emit('stranger_found', { roomId });
+      console.log(`✅ Matched ${socket.id} with ${strangerId} in room ${roomId}`);
+    } else {
+      waitingQueue.push(socket.id);
+      console.log(`🕐 No stranger found, added ${socket.id} to queue`);
+    }
+  });
+
+  socket.on('send_message', ({ roomId, message }) => {
+    io.to(roomId).emit('receive_message', { message, sender: socket.id });
+    console.log(`📤 ${socket.id} sent message to room ${roomId}: ${message}`);
+  });
+
+  socket.on('disconnect', () => {
+    console.log(`🔴 ${socket.id} disconnected`);
+
+    // Remove from waiting queue if present
+    const index = waitingQueue.indexOf(socket.id);
+    if (index !== -1) {
+      waitingQueue.splice(index, 1);
+      console.log(`❌ Removed ${socket.id} from queue`);
+    }
+  });
+};

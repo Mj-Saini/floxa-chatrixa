@@ -67,30 +67,17 @@ export default function StrangerChat() {
   const isConnectingRef = useRef(isConnecting);
   const waitingRef = useRef(waiting);
 
-  // Fetch dynamic stranger chat text on mount
+  // Set a static intro message on mount
   useEffect(() => {
-    fetch("https://chatapp-zssm.onrender.com/api/stranger-text")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && data.text) {
-          setMessages([
-            {
-              id: "system-intro-" + Date.now(),
-              content: data.text,
-              sender: "me",
-              timestamp: new Date(),
-              type: "system",
-            },
-          ]);
-        }
-      })
-      .catch((err) => {
-        toast({
-          title: "Error",
-          description: "Failed to load stranger chat intro text.",
-          variant: "destructive",
-        });
-      });
+    setMessages([
+      {
+        id: "system-intro-" + Date.now(),
+        content: "Welcome to Stranger Chat! Start chatting anonymously.",
+        sender: "me",
+        timestamp: new Date(),
+        type: "system",
+      },
+    ]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -112,134 +99,91 @@ export default function StrangerChat() {
   useEffect(() => {
     // Create socket only once
     if (!socketRef.current) {
-      socketRef.current = io("http://localhost:3001", { transports: ["websocket"] });
+      socketRef.current = io("http://localhost:5000", { transports: ["websocket"] });
     }
     const socket = socketRef.current;
 
-    // Listen for match
-    const onMatchFound = ({ chat, partner }: any) => {
-      console.log(`🎉 Match found! Chat ID: ${chat._id}, Partner:`, partner);
+    // Listen for stranger_found (match)
+    const onStrangerFound = ({ roomId, partnerSocketId }: any) => {
       setIsConnecting(false);
       setWaiting(false);
       setIsConnected(true);
-      setChatId(chat._id);
+      setChatId(roomId);
       setStrangerInfo({
-        country: partner.country || "Unknown",
-        gender: partner.gender || "Unknown",
+        country: "Unknown",
+        gender: "Unknown",
         isTyping: false,
-        name: partner.username || "Stranger",
-        avatar: partner.avatar || "",
+        name: "Stranger",
+        avatar: "",
       });
       setMessages([
         {
           id: "system-" + Date.now(),
-          content: `🌍 Connected to a person from ${partner.country || "Unknown"}`,
+          content: `🌍 Connected to a stranger!`,
           sender: "me",
           timestamp: new Date(),
           type: "system",
         },
       ]);
-      // Clear timeout if match is found
       if (searchTimeoutRef.current) {
         clearTimeout(searchTimeoutRef.current);
         searchTimeoutRef.current = null;
       }
     };
-    socket.on("match-found", onMatchFound);
+    socket.on("stranger_found", onStrangerFound);
 
-    // Listen for stranger messages
-    const onStrangerMessage = (data: any) => {
+    // Listen for receive_message
+    const onReceiveMessage = (data: any) => {
       setMessages((prev) => [
         ...prev,
         {
           id: Date.now().toString(),
-          content: data.content,
+          content: data.message,
           sender: "stranger",
-          timestamp: new Date(data.timestamp),
+          timestamp: new Date(),
           type: "text",
         },
       ]);
     };
-    socket.on("stranger-message-received", onStrangerMessage);
+    socket.on("receive_message", onReceiveMessage);
 
-    // Listen for queue joined
-    const onQueueJoined = () => {
-      setIsConnecting(true);
-      setWaiting(true);
-    };
-    socket.on("queue-joined", onQueueJoined);
-
-    // Listen for queue left
-    const onQueueLeft = () => {
+    // Listen for stranger_disconnected
+    const onStrangerDisconnected = () => {
       setIsConnected(false);
       setWaiting(false);
       setIsConnecting(false);
       setChatId(null);
       setStrangerInfo(null);
-      setMessages([]);
-      // Clear timeout if user leaves queue
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
-        searchTimeoutRef.current = null;
-      }
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          content: "Stranger has disconnected.",
+          sender: "me",
+          timestamp: new Date(),
+          type: "system",
+        },
+      ]);
     };
-    socket.on("queue-left", onQueueLeft);
-
-    // Listen for errors
-    const onError = (err: any) => {
-      toast({ title: "Error", description: err.message || "Unknown error", variant: "destructive" });
-      setIsConnecting(false);
-      setWaiting(false);
-      // Clear timeout on error
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
-        searchTimeoutRef.current = null;
-      }
-    };
-    socket.on("error", onError);
+    socket.on("stranger_disconnected", onStrangerDisconnected);
 
     // Clean up listeners and socket on unmount
     return () => {
-      socket.off("match-found", onMatchFound);
-      socket.off("stranger-message-received", onStrangerMessage);
-      socket.off("queue-joined", onQueueJoined);
-      socket.off("queue-left", onQueueLeft);
-      socket.off("error", onError);
+      socket.off("stranger_found", onStrangerFound);
+      socket.off("receive_message", onReceiveMessage);
+      socket.off("stranger_disconnected", onStrangerDisconnected);
       socket.disconnect();
       socketRef.current = null;
     };
-  }, [toast]);
+  }, []);
 
   // --- END SOCKET SETUP ---
 
   const handleConnect = () => {
     setIsConnecting(true);
     setWaiting(true);
-    // Determine userId: real user or guest
-    const userType = localStorage.getItem("userType");
-    let userId: string | null = null;
-    if (userType === "guest") {
-      userId = localStorage.getItem("guestId");
-      if (!userId) {
-        userId = `guest-${Math.random().toString(36).substr(2, 9)}`;
-        localStorage.setItem("guestId", userId);
-      }
-    } else {
-      userId = localStorage.getItem("userId");
-    }
-    if (!userId) {
-      toast({ title: "Login Required", description: "You must be logged in to use Stranger Chat.", variant: "destructive" });
-      setIsConnecting(false);
-      setWaiting(false);
-      return;
-    }
-    // Join queue
-    const gender = localStorage.getItem("userGender") || "any";
-    const country = localStorage.getItem("userCountry") || "any";
-    const preferences = { gender, language: country };
-    console.log(`🔗 Joining queue with userId: ${userId}, preferences:`, preferences);
     if (socketRef.current) {
-      socketRef.current.emit("join-stranger-queue", { userId, preferences });
+      socketRef.current.emit("find_stranger");
     }
     // Set timeout for no user found
     if (searchTimeoutRef.current) {
@@ -254,10 +198,6 @@ export default function StrangerChat() {
         });
         setIsConnecting(false);
         setWaiting(false);
-        // Optionally, leave the queue
-        if (socketRef.current) {
-          socketRef.current.emit("leave-stranger-queue", { userId });
-        }
       }
     }, 15000); // 15 seconds
   };
@@ -288,26 +228,18 @@ export default function StrangerChat() {
 
   const handleSendMessage = () => {
     if (!newMessage.trim() || !isConnected || !chatId) return;
-    const userType = localStorage.getItem("userType");
-    let userId: string | null = null;
-    if (userType === "guest") {
-      userId = localStorage.getItem("guestId");
-    } else {
-      userId = localStorage.getItem("userId");
-    }
-    if (!userId) return;
-    const message: Message = {
+    const message = {
       id: Date.now().toString(),
       content: newMessage,
-      sender: "me",
+      sender: "me" as const,
       timestamp: new Date(),
-      type: "text",
+      type: "text" as const,
     };
     setMessages((prev) => [...prev, message]);
     setNewMessage("");
     // Send message via socket
     if (socketRef.current) {
-      socketRef.current.emit("stranger-message", { userId, content: message.content, chatId });
+      socketRef.current.emit("send_message", { roomId: chatId, message: message.content });
     }
   };
 
