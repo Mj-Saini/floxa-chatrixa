@@ -200,11 +200,11 @@ export default function VideoCall() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <PageHeader title="Video Call" />
+    <div className="h-[calc(100vh - 140px)] bg-background">
+      <PageHeader title="" />
 
       <div className="container mx-auto px-4 py-6">
-        <BackButton />
+        {/* <BackButton /> */}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
           {/* Local Video */}
@@ -284,7 +284,7 @@ export default function VideoCall() {
         {/* Call Controls */}
         <Card className="mt-6">
           <CardContent className="p-6">
-            <div className="flex flex-col items-center space-y-4">
+            <div className="flex flex-col items-center space-y-4 pb-10">
               {/* Call Status */}
               <div className="flex items-center gap-4">
                 {isConnected && (

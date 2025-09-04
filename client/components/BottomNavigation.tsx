@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { MessageCircle, Video, Users, Bell, Phone } from "lucide-react";
+import { MessageCircle,  Users, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -8,6 +8,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 export default function BottomNavigation() {
   const location = useLocation();
   const isGroupChat = /^\/home\/groups\/chat\/[^/]+$/.test(location.pathname);
+  const isVideoCall = location.pathname === "/home/video-call";
+
+  const shouldShowNav = !isGroupChat && !isVideoCall;
+
   const userType = localStorage.getItem("userType");
   const [chatPopoverOpen, setChatPopoverOpen] = React.useState(false);
 
@@ -58,7 +62,7 @@ export default function BottomNavigation() {
   return (
 
     <>
-      {!isGroupChat &&
+      {shouldShowNav &&
         <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-t border-border/50">
           <nav className="flex items-center justify-around px-4 py-2">
             {navItems.map((item) => {
